@@ -6,7 +6,11 @@ export class AutomationController extends Controller {
   _max = 1;
   _targetValue;
   _invert = false;
-
+  _clickPosition;
+  _clickPositionLock;
+  _originalValue;
+  _originalValueLock;
+  
   get _value(): number {
     return !STATES_OFF.includes(this.stateObj.state)
       ? 1

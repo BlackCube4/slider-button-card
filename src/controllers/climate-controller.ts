@@ -3,7 +3,7 @@ import { capitalizeFirst } from '../utils';
 import { Controller } from './controller';
 
 export class ClimateController extends Controller {
-   _targetValue;
+  _targetValue;
   _invert = false;
   _clickPosition;
   _clickPositionLock;
