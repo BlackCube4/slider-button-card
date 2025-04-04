@@ -273,12 +273,12 @@ export class SliderButtonCardEditor extends ScopedRegistryHost(LitElement) imple
                     .checked=${this._slider.show_track}
                     .configValue=${'slider.show_track'}
                     @change=${this._valueChanged}
-                  ></mwc-switch>
-                </mwc-formfield>
-                <mwc-formfield .label=${localize('tabs.slider.toggle_on_click')}>
-                  <mwc-switch
-                    .checked=${this._slider.toggle_on_click}
-                    .configValue=${'slider.toggle_on_click'}
+                  ></ha-switch>
+                </ha-formfield>
+                <ha-formfield .label=${localize('tabs.slider.disable_sliding')}>
+                  <ha-switch
+                    .checked=${this._slider.disable_sliding}
+                    .configValue=${'slider.disable_sliding'}
                     @change=${this._valueChanged}
                   ></mwc-switch>
                 </mwc-formfield>
