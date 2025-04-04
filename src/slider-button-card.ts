@@ -503,7 +503,8 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
       flex-direction: column;
       justify-content: space-between;
       touch-action: pan-y;
-      overflow: hidden;      
+      background: var(--ha-card-border-color,var(--divider-color,#e0e0e0));;
+      overflow: hidden;         /* still needed or else the slider will trigger scroll bar when it leaves hui-view even though it's invisible */
       --mdc-icon-size: 2.2em;
     }
     ha-card[data-mode="top-bottom"],
@@ -550,7 +551,8 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
       min-height: 7rem;
       width: 100%;
       display: block;
-      overflow: hidden;
+      border-radius: calc(var(--ha-card-border-radius) - var(--ha-card-border-width, 1px));
+      mask-image: radial-gradient(white, black);
       transition: all 0.2s ease-in-out;
       touch-action: pan-y;
     }
