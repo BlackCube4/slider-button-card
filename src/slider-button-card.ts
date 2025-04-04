@@ -425,6 +425,7 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
       this.ctrl.originalValue = this.ctrl.value;
       this.ctrl.originalValueLock = true;
     }
+    this.hasSlid = false;
     // eslint-disable-next-line prefer-const
     oldPercentage = this.ctrl.originalValue;
   }
