@@ -42,13 +42,6 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
   @query('.button') button;
   @query('.action') action;
   @query('.slider') slider;
-
-  @state() private startX = 0;
-  @state() private startY = 0;
-  @state() private startPercentage = 0;
-  // @query('.slider') private slider!: HTMLDivElement;
-  @query('.slider-thumb') private thumb!: HTMLDivElement;
-
   private changing = false;
   private changed = false;
   private ctrl!: Controller;
@@ -417,31 +410,47 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
 
   @eventOptions({passive: true})
   private onPointerDown(event: PointerEvent): void {
-    if (this.ctrl.isSliderDisabled) return;
-    
-    event.preventDefault();
-    this.hasSlid = false;
+    if (this.config.slider?.direction === SliderDirections.TOP_BOTTOM
+      || this.config.slider?.direction === SliderDirections.BOTTOM_TOP) {
+        event.preventDefault();
+      }
+    event.stopPropagation();
+    if (this.ctrl.isSliderDisabled) {
+      return;
+    }
     this.slider.setPointerCapture(event.pointerId);
-    
-    // Store initial positions
-    this.startX = event.clientX;
-    this.startY = event.clientY;
-    this.startPercentage = this.ctrl.percentage;
-    
-    // Disable transitions during drag
-    this.thumb.style.transition = 'none';
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    let oldPercentage;
+    if (this.ctrl.originalValueLock != true) {
+      this.ctrl.originalValue = this.ctrl.value;
+      this.ctrl.originalValueLock = true;
+    }
+    this.hasSlid = false;
+    // eslint-disable-next-line prefer-const
+    oldPercentage = this.ctrl.originalValue;
   }
 
   @eventOptions({passive: true})
   private onPointerUp(event: PointerEvent): void {
+    if (this.ctrl.isSliderDisabled) {
+      return;
+    }
+    
+    if (this.config.slider?.direction === SliderDirections.TOP_BOTTOM
+      || this.config.slider?.direction === SliderDirections.BOTTOM_TOP) {
+        this.setStateValue(this.ctrl.targetValue);
+        this.slider.releasePointerCapture(event.pointerId);
+      }
+
+    if (!this.slider.hasPointerCapture(event.pointerId)) {
+       return;
+    }
+
+    this.setStateValue(this.ctrl.targetValue);
     this.slider.releasePointerCapture(event.pointerId);
-    
-    // Re-enable transitions
-    this.thumb.style.transition = 'transform var(--slider-transition-duration) ease-in';
-    
-    // Commit final value
-    this.ctrl.value = this.ctrl.targetValue;
     this.ctrl.originalValueLock = false;
+    this.ctrl.clickPositionLock = false;
   }
 
   private onPointerCancel(event: PointerEvent): void {
@@ -454,43 +463,40 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
   }
 
   @eventOptions({passive: true})
-  private onPointerMove(event: PointerEvent): void {
-    if (!this.slider.hasPointerCapture(event.pointerId)) return;
-  
-    this.hasSlid = true;
-
-    const rect = this.slider.getBoundingClientRect();
-    let delta, percentage;
-
-    switch(this.config.slider?.direction) {
-        case SliderDirections.LEFT_RIGHT:
-            delta = event.clientX - this.startX;
-            percentage = this.startPercentage + (delta / rect.width) * 100;
-            break;
-            
-        case SliderDirections.RIGHT_LEFT:
-            delta = event.clientX - this.startX;
-            percentage = this.startPercentage - (delta / rect.width) * 100;
-            break;
-            
-        case SliderDirections.TOP_BOTTOM:
-            delta = event.clientY - this.startY;
-            percentage = this.startPercentage + (delta / rect.height) * 100;
-            break;
-            
-        case SliderDirections.BOTTOM_TOP:
-            delta = event.clientY - this.startY;
-            percentage = this.startPercentage - (delta / rect.height) * 100;
-            break;
-            
-        default:
-            delta = event.clientX - this.startX;
-            percentage = this.startPercentage + (delta / rect.width) * 100;
+  private onPointerMove(event: any): void {
+    if (this.ctrl.isSliderDisabled) {
+      return;
     }
+    this.hasSlid = true;
+    if (!this.slider.hasPointerCapture(event.pointerId)) return;
+    const {left, top, width, height} = this.slider.getBoundingClientRect();
+    this.ctrl.log('event', event);
 
-    percentage = Math.max(this.ctrl.min, Math.min(this.ctrl.max, percentage));
-    this.updateValue(percentage);
-}
+    const percentage = this.ctrl.moveSlider(event, {left, top, width, height});
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    let clickPosition;
+    if (this.ctrl.clickPositionLock != true)
+    {
+      this.ctrl.clickPosition = percentage;
+      this.ctrl.clickPositionLock = true;
+    }
+    // eslint-disable-next-line prefer-const
+    clickPosition = this.ctrl.clickPosition;
+
+    // eslint-disable-next-line prefer-const
+    let delta = this.ctrl.clickPosition - percentage;
+    let newPercentage = this.ctrl.originalValue - delta;
+    newPercentage = normalize(newPercentage, this.ctrl.min, this.ctrl.max)
+
+    this.ctrl.log('oldPercentage', this.ctrl.originalValue);
+    this.ctrl.log('clickPosition', this.ctrl.clickPosition);
+    this.ctrl.log('onPointerMove', percentage);
+    this.ctrl.log('delta', delta);
+    this.ctrl.log('newPercentage', newPercentage)
+
+    this.updateValue(newPercentage);
+  }
 
   connectedCallback(): void {
     super.connectedCallback();
