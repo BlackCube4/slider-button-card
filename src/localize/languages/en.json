@@ -26,6 +26,8 @@
       "title": "Slider",
       "direction": "Direction",
       "background": "Background",
+      "min_value": "Min",
+      "max_value": "Max",
       "use_brightness": "Use brightness",
       "show_track": "Show track",
       "disable_sliding": "Disable Sliding",
@@ -63,10 +65,9 @@
     "custom": "Custom"
   },
   "color_mode": {
-    "label": "Icon color mode",
+    "label": "Color mode",
     "default": "Default theme",
     "state": "State color",
     "custom": "Custom color"
-  },
-  "color": "Custom color"
+  }
 }

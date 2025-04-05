@@ -26,6 +26,8 @@
       "title": "Schieberegler",
       "direction": "Richtung",
       "background": "Hintergrund",
+      "min_value": "Min",
+      "max_value": "Max",
       "use_brightness": "Helligkeit benutzen",
       "show_track": "Spur anzeigen",
       "disable_sliding": "Schieben deaktivieren",
@@ -63,10 +65,9 @@
     "custom": "benuzerdefiniert"
   },
   "color_mode": {
-    "label": "Icon-Farbmodus",
+    "label": "Farbmodus",
     "default": "Standard-Farbe",
     "state": "Zustandsfarbe",
     "custom": "Benutzerdefinierte Farbe"
-  },
-  "color": "Benutzerdefinierte Farbe"
+  }
 }

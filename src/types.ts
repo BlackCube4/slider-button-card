@@ -43,6 +43,8 @@ export interface IconConfig {
 export interface SliderConfig {
   min?: number;
   max?: number;
+  min_value?: number;
+  max_value?: number;
   step?: number;
   attribute?: string;
   direction?: SliderDirection;

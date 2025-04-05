@@ -360,6 +360,13 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
   private updateValue(value: number, changing = true): void {
     this.changing = changing;
     this.changed = !changing;
+
+    if (changing) {
+      const min = this.config.slider?.min_value ?? 0;
+      const max = this.config.slider?.max_value ?? 100;
+      value = Math.max(min, Math.min(value, max));
+    }
+    
     this.ctrl.targetValue = value;
     if (!this.button) {
       return

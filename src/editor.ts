@@ -268,6 +268,22 @@ export class SliderButtonCardEditor extends ScopedRegistryHost(LitElement) imple
               </div>
               ${this.renderColorMode('slider')}
               <div class="side-by-side">
+                <mwc-textfield
+                  label="${localize('tabs.slider.min_value')}"
+                  type="number"
+                  .value=${this._slider.min_value?.toString() ?? ''}
+                  .configValue=${'slider.min_value'}
+                  @input=${this._valueChanged}
+                ></mwc-textfield>
+                <mwc-textfield
+                  label="${localize('tabs.slider.max_value')}"
+                  type="number"
+                  .value=${this._slider.max_value?.toString() ?? ''}
+                  .configValue=${'slider.max_value'}
+                  @input=${this._valueChanged}
+                ></mwc-textfield>
+              </div>
+              <div class="side-by-side">
                 ${this.renderBrightness('slider')}
                 <mwc-formfield .label=${localize('tabs.slider.show_track')}>
                   <mwc-switch
@@ -384,12 +400,11 @@ export class SliderButtonCardEditor extends ScopedRegistryHost(LitElement) imple
           `${path}.color_mode`,
           this.colorModes.map(color_mode => {
             return {'value': color_mode, 'label': localize(`color_mode.${color_mode}`)}
-          }), localize('color'),
+          }), localize(`color_mode.label`),
           item.color_mode || ''
         )}
         ${item.color_mode === 'custom' ? html`
           <mwc-textfield
-            label="${localize('color')}"
             .value=${item.color || ''}
             .configValue="${path}.color"
             @input=${this._valueChanged}
