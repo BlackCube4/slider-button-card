@@ -1,6 +1,6 @@
 import { computeStateDomain, domainIcon, HomeAssistant } from 'custom-card-helpers';
 import { HassEntity } from 'home-assistant-js-websocket';
-import { SliderBackground, SliderButtonCardConfig, SliderDirections } from '../types';
+import { SliderBackground, SliderButtonCardConfig, SliderDirection } from '../types';
 import { getLightColorBasedOnTemperature, normalize, percentageToValue, toPercentage } from '../utils';
 
 export interface Style {
@@ -17,7 +17,6 @@ export interface ObjectStyle {
 export abstract class Controller {
   _config: SliderButtonCardConfig;
   _hass: any;
-  _sliderPrevColor = '';
 
   abstract _value?: number;
   abstract _originalValue?: number;
@@ -235,26 +234,29 @@ export abstract class Controller {
   }
 
   get iconFilter(): string {
-    if (!this._config.icon?.use_state_color || this.percentage === 0) {
+    if (this._config.icon?.color_mode !== 'state' || this.percentage === 0) {
       return 'brightness(100%)';
     }
     return `brightness(${(this.percentage + 100) / 2}%)`;
   }
 
   get iconColor(): string {
-    if (this._config.icon?.use_state_color) {
-      if (this.stateObj.attributes.hs_color) {
-        const [hue, sat] = this.stateObj.attributes.hs_color;
-        if (sat > 10) {
-          return `hsl(${hue}, 100%, ${100 - sat / 2}%)`;
+    switch(this._config.icon?.color_mode) {
+      case 'state':
+        if (this.stateObj.attributes.hs_color) {
+          const [hue, sat] = this.stateObj.attributes.hs_color;
+          if (sat > 10) {
+            return `hsl(${hue}, 100%, ${100 - sat / 2}%)`;
+          }
         }
-      } else if (this.percentage > 0) {
-        return 'var(--paper-item-icon-active-color, #fdd835)'
-      } else {
-        return 'var(--paper-item-icon-color, #44739e)'
-      }
+        return this.percentage > 0 
+          ? 'var(--paper-item-icon-active-color, #fdd835)'
+          : 'var(--paper-item-icon-color, #44739e)';
+      case 'custom':
+        return this._config.icon?.color || '';
+      default:
+        return '';
     }
-    return '';
   }
 
   get iconRotateSpeed(): string {
@@ -269,31 +271,35 @@ export abstract class Controller {
   }
 
   get sliderColor(): string {
-    if (this._config.slider?.use_state_color) {
-      if (this.stateObj.attributes.hs_color) {
-        const [hue, sat] = this.stateObj.attributes.hs_color;
-        if (sat > 10) {
-          const color = `hsl(${hue}, 100%, ${100 - sat / 2}%)`;
-          this._sliderPrevColor = color;
+    console.log("test", this._config.name, this._config.slider?.color_mode)
+    switch(this._config.slider?.color_mode) {
+      case 'state':
+        if (this.stateObj.attributes.hs_color) {
+          const [hue, sat] = this.stateObj.attributes.hs_color;
+          if (sat > 10) {
+            const color = `hsl(${hue}, 100%, ${100 - sat / 2}%)`;
+            return color;
+          }
+        } else  if (
+          this.stateObj.attributes.color_temp &&
+          this.stateObj.attributes.min_mireds &&
+          this.stateObj.attributes.max_mireds
+        ) {
+          const color = getLightColorBasedOnTemperature(
+            this.stateObj.attributes.color_temp,
+            this.stateObj.attributes.min_mireds,
+            this.stateObj.attributes.max_mireds,
+          );
           return color;
         }
-      } else  if (
-        this.stateObj.attributes.color_temp &&
-        this.stateObj.attributes.min_mireds &&
-        this.stateObj.attributes.max_mireds
-      ) {
-        const color = getLightColorBasedOnTemperature(
-          this.stateObj.attributes.color_temp,
-          this.stateObj.attributes.min_mireds,
-          this.stateObj.attributes.max_mireds,
-        );
-        this._sliderPrevColor = color;
-        return color;
-      } else if (this._sliderPrevColor.startsWith('hsl') || this._sliderPrevColor.startsWith('rgb')) {
-        return this._sliderPrevColor;
-      }
+        return 'inherit';
+
+      case 'custom':
+        return this._config.slider?.color || 'inherit';
+        
+      default:
+        return 'inherit';
     }
-    return 'inherit';
   }
 
   moveSlider(event: any, {left, top, width, height}): number {
@@ -309,7 +315,7 @@ export abstract class Controller {
   calcMovementPercentage(event: any, {left, top, width, height}): number {
     let percentage;
     switch(this._config.slider?.direction) {
-      case SliderDirections.LEFT_RIGHT:
+      case SliderDirection.LEFT_RIGHT:
         percentage = toPercentage(
           event.clientX,
           left,
@@ -319,7 +325,7 @@ export abstract class Controller {
           percentage = 100 - percentage;
         }
         break
-      case SliderDirections.RIGHT_LEFT:
+      case SliderDirection.RIGHT_LEFT:
         percentage = toPercentage(
           event.clientX,
           left,
@@ -329,7 +335,7 @@ export abstract class Controller {
           percentage = 100 - percentage;
         }
         break
-      case SliderDirections.TOP_BOTTOM:
+      case SliderDirection.TOP_BOTTOM:
         percentage = toPercentage(
           event.clientY,
           top,
@@ -339,7 +345,7 @@ export abstract class Controller {
           percentage = 100 - percentage;
         }
         break
-      case SliderDirections.BOTTOM_TOP:
+      case SliderDirection.BOTTOM_TOP:
         percentage = toPercentage(
           event.clientY,
           top,

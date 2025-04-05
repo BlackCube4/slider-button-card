@@ -254,62 +254,63 @@ export class LightController extends Controller {
 
   get sliderColor(): string {
     let returnColor = 'inherit';
-    if (this._config.slider?.use_state_color) {
-      if (this.stateObj.attributes.hs_color && this.attribute !== LightAttributes.COLOR_TEMP) {
-        const [hue, sat] = this.stateObj.attributes.hs_color;
-        let useHue = hue;
-        let useSat = sat;
-        switch(this.attribute) {
-          case LightAttributes.HUE:
-            useHue = this.valueFromPercentage;
-            break;
-          case LightAttributes.SATURATION:
-            useSat = this.percentage;
-            break;
-        }
-        if (useSat > 10) {
-          returnColor = `hsl(${useHue}, 100%, ${100 - useSat / 2}%)`;
-          this._sliderPrevColor = returnColor;
-        }
-      } else if (
-        this.attribute === LightAttributes.HUE || this.attribute === LightAttributes.SATURATION
-      ) {
-        let useHue = 0;
-        let useSat = 20;
-        switch(this.attribute) {
-          case LightAttributes.HUE:
-            useHue = this.valueFromPercentage;
-            break;
-          case LightAttributes.SATURATION:
-            useSat = this.percentage;
-            break;
-        }
-        if (useSat > 10) {
-          returnColor = `hsl(${useHue}, 100%, ${100 - useSat / 2}%)`;
-          this._sliderPrevColor = returnColor;
-        }
-      } else if (
-        this.stateObj.attributes.color_temp &&
-        this.stateObj.attributes.min_mireds &&
-        this.stateObj.attributes.max_mireds
-      ) {
-        returnColor = getLightColorBasedOnTemperature(
-          this.attribute === LightAttributes.COLOR_TEMP ? this.valueFromPercentage : this.stateObj.attributes.color_temp,
-          this.stateObj.attributes.min_mireds,
+    switch(this._config.slider?.color_mode) {
+      case 'state':
+        if (this.stateObj.attributes.hs_color && this.attribute !== LightAttributes.COLOR_TEMP) {
+          const [hue, sat] = this.stateObj.attributes.hs_color;
+          let useHue = hue;
+          let useSat = sat;
+          switch(this.attribute) {
+            case LightAttributes.HUE:
+              useHue = this.valueFromPercentage;
+              break;
+            case LightAttributes.SATURATION:
+              useSat = this.percentage;
+              break;
+          }
+          if (useSat > 10) {
+            returnColor = `hsl(${useHue}, 100%, ${100 - useSat / 2}%)`;
+          }
+        } else if (
+          this.attribute === LightAttributes.HUE || this.attribute === LightAttributes.SATURATION
+        ) {
+          let useHue = 0;
+          let useSat = 20;
+          switch(this.attribute) {
+            case LightAttributes.HUE:
+              useHue = this.valueFromPercentage;
+              break;
+            case LightAttributes.SATURATION:
+              useSat = this.percentage;
+              break;
+          }
+          if (useSat > 10) {
+            returnColor = `hsl(${useHue}, 100%, ${100 - useSat / 2}%)`;
+          }
+        } else if (
+          this.stateObj.attributes.color_temp &&
+          this.stateObj.attributes.min_mireds &&
           this.stateObj.attributes.max_mireds
-        );
-        this._sliderPrevColor = returnColor;
-      } else if (this.attribute === LightAttributes.COLOR_TEMP) {
-        returnColor = getLightColorBasedOnTemperature(
-          this.valueFromPercentage,
-          153,
-          500
-        );
-        this._sliderPrevColor = returnColor;
-      } else if (this._sliderPrevColor.startsWith('hsl') || this._sliderPrevColor.startsWith('rgb')) {
-        returnColor = this._sliderPrevColor;
-      }
+        ) {
+          returnColor = getLightColorBasedOnTemperature(
+            this.attribute === LightAttributes.COLOR_TEMP ? this.valueFromPercentage : this.stateObj.attributes.color_temp,
+            this.stateObj.attributes.min_mireds,
+            this.stateObj.attributes.max_mireds
+          );
+        } else if (this.attribute === LightAttributes.COLOR_TEMP) {
+          returnColor = getLightColorBasedOnTemperature(
+            this.valueFromPercentage,
+            153,
+            500
+          );
+        }
+        return returnColor;
+
+      case 'custom':
+        return this._config.slider?.color || 'inherit';
+        
+      default:
+        return 'inherit';
     }
-    return returnColor;
   }
 }

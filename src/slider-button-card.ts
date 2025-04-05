@@ -13,7 +13,7 @@ import './editor';
 import { localize } from './localize/localize';
 
 import type { SliderButtonCardConfig } from './types';
-import { ActionButtonConfigDefault, ActionButtonMode, IconConfigDefault, SliderDirections } from './types';
+import { ActionButtonConfigDefault, ActionButtonMode, IconConfigDefault, SliderDirection } from './types';
 import { getSliderDefaultForEntity, normalize } from './utils';
 
 /* eslint no-console: 0 */
@@ -410,8 +410,8 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
 
   @eventOptions({passive: true})
   private onPointerDown(event: PointerEvent): void {
-    if (this.config.slider?.direction === SliderDirections.TOP_BOTTOM
-      || this.config.slider?.direction === SliderDirections.BOTTOM_TOP) {
+    if (this.config.slider?.direction === SliderDirection.TOP_BOTTOM
+      || this.config.slider?.direction === SliderDirection.BOTTOM_TOP) {
         event.preventDefault();
       }
     event.stopPropagation();
@@ -444,8 +444,8 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
   }
 
   private onPointerCancel(event: PointerEvent): void {
-    if (this.config.slider?.direction === SliderDirections.TOP_BOTTOM
-      || this.config.slider?.direction === SliderDirections.BOTTOM_TOP) {
+    if (this.config.slider?.direction === SliderDirection.TOP_BOTTOM
+      || this.config.slider?.direction === SliderDirection.BOTTOM_TOP) {
         return;
       }
     this.updateValue(this.ctrl.value, false);
@@ -502,7 +502,6 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
       box-sizing: border-box;
       height: 100%;
       width: 100%;
-      min-height: 7rem;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
@@ -511,16 +510,10 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
       overflow: hidden;         /* still needed or else the slider will trigger scroll bar when it leaves hui-view even though it's invisible */
       line-height: 0;
     }
-    ha-card[data-mode="top-bottom"],
-    ha-card[data-mode="bottom-top"] {
-      touch-action: none;
-    }
     ha-card.square {
       aspect-ratio: 1 / 1;
     }
-    ha-card.compact {
-      min-height: 3rem !important;
-    }    
+      
     :host {
       --slider-bg-default-color: var(--primary-color, rgb(95, 124, 171));
       --slider-bg: var(--slider-color);
@@ -629,24 +622,21 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
       justify-content: center;
 
       white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
       text-shadow: var(--state-text-shadow);
     }
     .compact .text {
+      height: 36px;
       left: 0.5rem;
       padding: 0;
-      line-height: 1rem;
-    }
-    .compact.hide-action .text {         
-      max-width: calc(100% - 2em);      
-    }    
+    }  
 
     /* --- LABEL --- */
     
     .name {
       color: var(--label-color-on, var(--primary-text-color, white));
       text-shadow: var(--label-text-shadow, none);
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     .off .name {
       color: var(--label-color-off, var(--primary-text-color, white));
@@ -667,6 +657,8 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
     
     .state {
       transition: font-size 0.1s ease-in-out;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     .changing .state {
       font-size: 15px;
@@ -677,8 +669,6 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
     .unavailable .state {
       color: var(--disabled-text-color);
     }
-    .compact .state {
-    }
 
     .oneliner {      
       /* color: var(--state-color-on, var(--label-badge-text-color, white)); */
@@ -687,6 +677,8 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
       font-size: 12px;
       line-height: 16px;
       letter-spacing: .4px;
+      display: block;
+      overflow: hidden;
     }
     
     /* --- SLIDER --- */    

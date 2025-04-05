@@ -20,8 +20,7 @@
       "title": "Icon",
       "icon": "Icon (optional)",
       "show_icon": "Icon anzeigen",
-      "use_state_color": "Zustandsfarbe verwenden",
-      "tap_action": "Tap action"
+      "tap_action": "Tap Aktion"
     },
     "slider": {
       "title": "Schieberegler",
@@ -62,5 +61,12 @@
   "mode": {
     "toggle": "Umschalter",
     "custom": "benuzerdefiniert"
-  }
+  },
+  "color_mode": {
+    "label": "Icon-Farbmodus",
+    "default": "Standard-Farbe",
+    "state": "Zustandsfarbe",
+    "custom": "Benutzerdefinierte Farbe"
+  },
+  "color": "Benutzerdefinierte Farbe"
 }

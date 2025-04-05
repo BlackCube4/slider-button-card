@@ -17,7 +17,7 @@ import { textfieldDefinition } from '../elements/textfield';
 import { ScopedRegistryHost } from '@lit-labs/scoped-registry-mixin';
 import { ActionConfig, HomeAssistant, LovelaceCardEditor, computeDomain, fireEvent } from 'custom-card-helpers';
 import { localize } from './localize/localize';
-import { ActionButtonConfig, ActionButtonConfigDefault, ActionButtonMode, Domain, IconConfig, IconConfigDefault, SliderBackground, SliderButtonCardConfig, SliderConfig, SliderConfigDefault, SliderDirections } from './types';
+import { ActionButtonConfig, ActionButtonConfigDefault, ActionButtonMode, Domain, IconConfig, IconConfigDefault, SliderBackground, SliderButtonCardConfig, SliderConfig, SliderConfigDefault, SliderDirection, ColorMode } from './types';
 import { applyPatch, getEnumValues, getSliderDefaultForEntity } from './utils';
 
 @customElement('slider-button-card-editor')
@@ -28,9 +28,10 @@ export class SliderButtonCardEditor extends ScopedRegistryHost(LitElement) imple
   @state() private _helpers?: any;
 
   private _initialized = false;
-  private directions = getEnumValues(SliderDirections);
+  private directions = getEnumValues(SliderDirection);
   private backgrounds = getEnumValues(SliderBackground);
   private actionModes = getEnumValues(ActionButtonMode);
+  private colorModes = getEnumValues(ColorMode);
 
   static elementDefinitions = {
     ...formfieldDefinition,
@@ -221,6 +222,7 @@ export class SliderButtonCardEditor extends ScopedRegistryHost(LitElement) imple
                 )}
                 @value-changed=${this._valueChanged}
               ></ha-icon-picker>
+              ${this.renderColorMode('icon')}
               <div class="side-by-side">
                 <mwc-formfield label="${localize('tabs.icon.show_icon')}">
                   <mwc-switch
@@ -229,7 +231,6 @@ export class SliderButtonCardEditor extends ScopedRegistryHost(LitElement) imple
                     @change=${this._valueChanged}
                   ></mwc-switch>
                 </mwc-formfield>
-                ${this.renderStateColor('icon')}
               </div>
               <ha-selector
                 .hass=${this.hass}
@@ -265,9 +266,9 @@ export class SliderButtonCardEditor extends ScopedRegistryHost(LitElement) imple
                   this._slider.background || ''
                 )}
               </div>
+              ${this.renderColorMode('slider')}
               <div class="side-by-side">
                 ${this.renderBrightness('slider')}
-                ${this.renderStateColor('slider')}
                 <mwc-formfield .label=${localize('tabs.slider.show_track')}>
                   <mwc-switch
                     .checked=${this._slider.show_track}
@@ -375,16 +376,27 @@ export class SliderButtonCardEditor extends ScopedRegistryHost(LitElement) imple
     `;
   }
 
-  protected renderStateColor(path: string): TemplateResult | void {
+  protected renderColorMode(path: string): TemplateResult | void {
     const item = this[`_${path}`];
     return html`
-      <mwc-formfield .label=${localize('tabs.icon.use_state_color')}>
-        <mwc-switch
-          .checked=${item.use_state_color}
-          .configValue="${path}.use_state_color"
-          @change=${this._valueChanged}
-        ></mwc-switch>
-      </mwc-formfield>
+      <div class="side-by-side">
+        ${this._renderOptionSelector(
+          `${path}.color_mode`,
+          this.colorModes.map(color_mode => {
+            return {'value': color_mode, 'label': localize(`color_mode.${color_mode}`)}
+          }), localize('color'),
+          item.color_mode || ''
+        )}
+        ${item.color_mode === 'custom' ? html`
+          <mwc-textfield
+            label="${localize('color')}"
+            .value=${item.color || ''}
+            .configValue="${path}.color"
+            @input=${this._valueChanged}
+            type="color"
+          ></mwc-textfield>
+        ` : ''}
+      </div>
     `;
   }
 

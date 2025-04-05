@@ -20,7 +20,6 @@
       "title": "Icon",
       "icon": "Icon (Optional)",
       "show_icon": "Show icon",
-      "use_state_color": "Use state color",
       "tap_action": "Tap action"
     },
     "slider": {
@@ -62,5 +61,12 @@
   "mode": {
     "toggle": "Toggle",
     "custom": "Custom"
-  }
+  },
+  "color_mode": {
+    "label": "Icon color mode",
+    "default": "Default theme",
+    "state": "State color",
+    "custom": "Custom color"
+  },
+  "color": "Custom color"
 }
