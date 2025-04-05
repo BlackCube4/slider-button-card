@@ -436,16 +436,6 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
     if (this.ctrl.isSliderDisabled) {
       return;
     }
-    
-    if (this.config.slider?.direction === SliderDirections.TOP_BOTTOM
-      || this.config.slider?.direction === SliderDirections.BOTTOM_TOP) {
-        this.setStateValue(this.ctrl.targetValue);
-        this.slider.releasePointerCapture(event.pointerId);
-      }
-
-    if (!this.slider.hasPointerCapture(event.pointerId)) {
-       return;
-    }
 
     this.setStateValue(this.ctrl.targetValue);
     this.slider.releasePointerCapture(event.pointerId);
