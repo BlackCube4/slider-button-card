@@ -183,9 +183,9 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
             <div class="slider-bg"></div>
             <div class="slider-thumb"></div>           
           </div>
-          ${this.renderText()}
           ${this.renderAction()}
           ${this.renderIcon()}
+          ${this.renderText()}
         </div>
       </ha-card>
     `;
@@ -552,7 +552,6 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
       padding: 0.8rem;
       box-sizing: border-box;
       height: 100%;
-      min-height: 7rem;
       width: 100%;
       display: block;
       border-radius: calc(var(--ha-card-border-radius) - var(--ha-card-border-width, 1px));
@@ -565,7 +564,6 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
       touch-action: none;
     }
     ha-card.compact .button {
-      min-height: 3rem !important;
       padding: 10px;
     }
     .button.off {
@@ -620,23 +618,24 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
     /* --- TEXT --- */
     
     .text {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      padding: 0.8rem;
+      position: relative;
+      padding-top: inherit;
       pointer-events: none;
       user-select: none;
       font-size: 1.1rem;
       line-height: 1.3rem;
-      max-width: calc(100% - 2em);
-      /*text-shadow: rgb(255 255 255 / 10%) -1px -1px 1px, rgb(0 0 0 / 50%) 1px 1px 1px;*/
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      text-shadow: var(--state-text-shadow);
     }
     .compact .text {
-      position: relative;
       left: 0.5rem;
-      display: inline-block;
       padding: 0;
-      overflow: hidden;
       line-height: 1rem;
     }
     .compact.hide-action .text {         
@@ -647,9 +646,6 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
     
     .name {
       color: var(--label-color-on, var(--primary-text-color, white));
-      text-overflow: ellipsis;
-      overflow: hidden;
-      white-space: nowrap;
       text-shadow: var(--label-text-shadow, none);
     }
     .off .name {
@@ -669,17 +665,8 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
     
     /* --- STATE --- */
     
-    .state {      
-      color: var(--state-color-on, var(--label-badge-text-color, white));
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      text-shadow: var(--state-text-shadow);
+    .state {
       transition: font-size 0.1s ease-in-out;
-      font-weight: 400;
-      font-size: 12px;
-      line-height: 16px;
-      letter-spacing: .4px;
-      color: var(--primary-text-color);
     }
     .changing .state {
       font-size: 15px;
@@ -691,42 +678,17 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
       color: var(--disabled-text-color);
     }
     .compact .state {
-      max-width: calc(100% - 0em);
-      overflow: hidden;
-    }
-    
-    /* --- ATTRIBUTE --- */
-
-    .attribute {      
-      /*
-      color: var(--state-color-on, var(--label-badge-text-color, white));
-      text-overflow: ellipsis;
-      overflow: hidden;
-      white-space: nowrap;
-      text-shadow: var(--state-text-shadow);
-      max-width: calc(50% -2em);
-      transition: font-size 0.1s ease-in-out;
-      border: 1px solid red; 
-      */
-    }
-
-    .compact .attribute {
-      display: inline-block;
-      max-width: calc(100% - 0em);
-      overflow: hidden;
     }
 
     .oneliner {      
-      color: var(--state-color-on, var(--label-badge-text-color, white));
-      text-overflow: ellipsis;
-      overflow: hidden;
-      white-space: nowrap;
-      max-width:  20px;
-      width: 20px;
-      text-shadow: var(--state-text-shadow);
-      transition: font-size 0.1s ease-in-out;
-      /*border: 1px solid blue;*/
+      /* color: var(--state-color-on, var(--label-badge-text-color, white)); */
+      color: var(--primary-text-color);
+      font-weight: 400;
+      font-size: 12px;
+      line-height: 16px;
+      letter-spacing: .4px;
     }
+    
     /* --- SLIDER --- */    
     
     .slider {
