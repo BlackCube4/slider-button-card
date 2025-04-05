@@ -916,7 +916,7 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
       float: right;
       width: 36px;
       height: 36px;
-      color: var(--action-icon-color-on, var(--paper-item-icon-color, black));
+      /* color: var(--action-icon-color-on, var(--paper-item-icon-color, black)); */
       cursor: pointer;
       outline: none;
       display: flex;

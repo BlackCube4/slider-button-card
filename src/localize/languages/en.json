@@ -11,34 +11,34 @@
       "entity": "Entity (Required)",
       "attribute": "Attribute (Optional)",
       "name": "Name (Optional)",
-      "show_name": "Show name?",
-      "show_state": "Show state?",
-      "show_attribute": "Show attribute?",
-      "compact": "Compact?"
+      "show_name": "Show name",
+      "show_state": "Show state",
+      "show_attribute": "Show attribute",
+      "compact": "Compact"
     },
     "icon": {
       "title": "Icon",
       "icon": "Icon (Optional)",
-      "show_icon": "Show icon?",
-      "use_state_color": "Use state color?",
+      "show_icon": "Show icon",
+      "use_state_color": "Use state color",
       "tap_action": "Tap action"
     },
     "slider": {
       "title": "Slider",
       "direction": "Direction",
       "background": "Background",
-      "use_brightness": "Use brightness?",
-      "show_track": "Show track?",
+      "use_brightness": "Use brightness",
+      "show_track": "Show track",
       "disable_sliding": "Disable Sliding",
-      "force_square": "Force square?",
+      "force_square": "Force square",
       "tap_action": "Tap Action"
     },
     "action_button": {
       "title": "Action button",
       "mode": "Mode",
       "icon": "Icon",
-      "show_button": "Show button?",
-      "show_spinner": "Show spinner?",
+      "show_button": "Show button",
+      "show_spinner": "Show spinner",
       "tap_action": "Tap action"
     }
   },

@@ -8,35 +8,38 @@
   "tabs": {
     "general": {
       "title": "Allgemein",
-      "entity": "Entiät (vorgeschrieben)",
+      "entity": "Entiät (notwendig)",
+      "attribute": "Attribut (optional)",
       "name": "Name (optional)",
-      "show_name": "Namen zeigen?",
-      "show_state": "Zustand zeigen?",
-      "compact": "Kompakt?"
+      "show_name": "Namen anzeigen",
+      "show_state": "Zustand anzeigen",
+      "show_attribute": "Attribut anzeigen",
+      "compact": "Kompakt"
     },
     "icon": {
       "title": "Icon",
       "icon": "Icon (optional)",
-      "show_icon": "Icon zeigen?",
-      "use_state_color": "Zustandsfarbe verwenden?",
+      "show_icon": "Icon anzeigen",
+      "use_state_color": "Zustandsfarbe verwenden",
       "tap_action": "Tap action"
     },
     "slider": {
       "title": "Schieberegler",
       "direction": "Richtung",
       "background": "Hintergrund",
-      "use_brightness": "Helligkeit benutzen?",
-      "show_track": "Spur anzeigen?",
-      "toggle_on_click": "Als Schalter benutzen (schieben deaktivieren)",
-      "force_square": "Quadrat erzwingen?"
+      "use_brightness": "Helligkeit benutzen",
+      "show_track": "Spur anzeigen",
+      "disable_sliding": "Schieben deaktivieren",
+      "force_square": "Quadrat erzwingen",
+      "tap_action": "Tap Aktion"
     },
     "action_button": {
       "title": "Action-Knopf",
       "mode": "Modus",
       "icon": "Icon",
-      "show_button": "Knopf zeigen?",
-      "show_spinner": "Spinner anzeigen?",
-      "tap_action": "Tap action"
+      "show_button": "Knopf anzeigen",
+      "show_spinner": "Spinner anzeigen",
+      "tap_action": "Tap Aktion"
     }
   },
   "state": {
@@ -45,6 +48,7 @@
   },
   "direction": {
     "left-right": "Links nach Rechts",
+    "right-left": "Rechts nach Links",
     "top-bottom": "Oben nach Unten",
     "bottom-top": "Unten nach Oben"
   },
