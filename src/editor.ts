@@ -453,6 +453,7 @@ export class SliderButtonCardEditor extends ScopedRegistryHost(LitElement) imple
       }
       mwc-switch {
         padding: 16px 6px;
+        --mdc-theme-secondary: var(--mdc-theme-primary);
       }
       .side-by-side {
         display: flex;

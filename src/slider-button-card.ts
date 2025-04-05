@@ -253,6 +253,7 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
              'background-image': `${backgroundImage}`,
            })}
            >
+        <icon-background></icon-background>
         <ha-icon
           tabindex="-1"
           data-domain=${computeStateDomain(this.ctrl.stateObj)}
@@ -518,7 +519,7 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
       touch-action: pan-y;
       background: var(--ha-card-border-color,var(--divider-color,#e0e0e0));;
       overflow: hidden;         /* still needed or else the slider will trigger scroll bar when it leaves hui-view even though it's invisible */
-      --mdc-icon-size: 2.2em;
+      line-height: 0;
     }
     ha-card[data-mode="top-bottom"],
     ha-card[data-mode="bottom-top"] {
@@ -575,6 +576,7 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
     }
     ha-card.compact .button {
       min-height: 3rem !important;
+      padding: 10px;
     }
     .button.off {
       background-color: var(--btn-bg-color-off);
@@ -585,13 +587,26 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
     .icon {
       position: relative;
       cursor: pointer;
-      width: var(--mdc-icon-size, 24px);
-      height: var(--mdc-icon-size, 24px);
+      width: 36px;
+      height: 36px;
       box-sizing: border-box;
       padding: 0;
       outline: none;
       animation: var(--icon-rotate-speed, 0s) linear 0s infinite normal both running rotate;
+      border-radius: 50%;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: var(--ha-card-background, var(--card-background-color, #fff));
       -webkit-tap-highlight-color: transparent;
+    }
+    .icon icon-background {
+      background: var(--icon-color);
+      opacity: 0.2;
+      width: 100%;
+      height: 100%;
+      position: absolute;
     }
     .icon ha-icon {
       filter: var(--icon-filter, brightness(100%));
@@ -628,14 +643,11 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
     }
     .compact .text {
       position: relative;
-      top: 0.5rem;
       left: 0.5rem;
       display: inline-block;
       padding: 0;
-      height: 1.3rem;
-      width: 100%;
       overflow: hidden;
-      max-width: calc(100% - 4em);
+      line-height: 1rem;
     }
     .compact.hide-action .text {         
       max-width: calc(100% - 2em);      
@@ -658,8 +670,11 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
       color: var(--disabled-text-color);
     }
     .compact .name {
-      display: inline-block;   
-      max-width: calc(100% - 3.5em);
+      font-weight: 500;
+      font-size: 14px;
+      line-height: 20px;
+      letter-spacing: .1px;
+      color: var(--primary-text-color);
     }    
     
     /* --- STATE --- */
@@ -670,9 +685,14 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
       white-space: nowrap;
       text-shadow: var(--state-text-shadow);
       transition: font-size 0.1s ease-in-out;
+      font-weight: 400;
+      font-size: 12px;
+      line-height: 16px;
+      letter-spacing: .4px;
+      color: var(--primary-text-color);
     }
     .changing .state {
-      font-size: 150%;
+      font-size: 15px;
     }
     .off .state {
       color: var(--state-color-off, var(--disabled-text-color));
@@ -681,7 +701,6 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
       color: var(--disabled-text-color);
     }
     .compact .state {
-      display: inline-block;
       max-width: calc(100% - 0em);
       overflow: hidden;
     }
@@ -853,7 +872,19 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
       left: 0px;
       height: 2px;
       width: 100%;              
-    }    
+    }
+    .slider[data-mode="right-left"] .slider-thumb:before {
+      left: auto;
+      right: -2px;
+    }
+    .slider[data-mode="bottom-top"] .slider-thumb:before {
+      top: auto;
+      bottom: -2px;
+      left: 0px;
+      height: 2px;
+      width: 100%;
+    }
+    
     .changing .slider-thumb:before {
       opacity: 0.5;    
     }
@@ -883,17 +914,18 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
     .action {
       position: relative;
       float: right;
-      width: var(--mdc-icon-size, 24px);
-      height: var(--mdc-icon-size, 24px);
+      width: 36px;
+      height: 36px;
       color: var(--action-icon-color-on, var(--paper-item-icon-color, black));
       cursor: pointer;
       outline: none;
+      display: flex;
+      justify-content: center;
+      align-items: center;
       -webkit-tap-highlight-color: transparent;
+      --mdc-icon-size: 26px;
     }    
     .action ha-switch {
-      position: absolute;
-      right: 0;
-      top: 5px;
     }    
     .off .action {
       color: var(--action-icon-color-off, var(--paper-item-icon-color, black));
@@ -905,8 +937,6 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
 
     .circular-loader {
       position: absolute;
-      left: -8px;
-      top: -8px;
       width: calc(var(--mdc-icon-size, 24px) + 16px);
       height: calc(var(--mdc-icon-size, 24px) + 16px);
       opacity: 0;
