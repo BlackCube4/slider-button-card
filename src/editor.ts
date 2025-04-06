@@ -231,6 +231,13 @@ export class SliderButtonCardEditor extends ScopedRegistryHost(LitElement) imple
                     @change=${this._valueChanged}
                   ></mwc-switch>
                 </mwc-formfield>
+                <mwc-formfield label="${localize('tabs.icon.use_brightness')}">
+                  <mwc-switch
+                    .checked=${this._icon.use_brightness}
+                    .configValue=${'icon.use_brightness'}
+                    @change=${this._valueChanged}
+                  ></mwc-switch>
+                </mwc-formfield>
               </div>
               <ha-selector
                 .hass=${this.hass}
@@ -384,8 +391,8 @@ export class SliderButtonCardEditor extends ScopedRegistryHost(LitElement) imple
     return html`
       <mwc-formfield .label=${localize('tabs.slider.use_brightness')}>
         <mwc-switch
-          .checked=${item.use_percentage_bg_opacity}
-          .configValue="${path}.use_percentage_bg_opacity"
+          .checked=${item.use_brightness}
+          .configValue="${path}.use_brightness"
           @change=${this._valueChanged}
         ></mwc-switch>
       </mwc-formfield>
@@ -480,7 +487,8 @@ export class SliderButtonCardEditor extends ScopedRegistryHost(LitElement) imple
       }
       mwc-switch {
         padding: 16px 6px;
-        --mdc-theme-secondary: var(--mdc-theme-primary);
+        --mdc-theme-secondary: var(--switch-checked-button-color);
+        --mdc-theme-surface: var(--switch-unchecked-button-color);
       }
       .side-by-side {
         display: flex;

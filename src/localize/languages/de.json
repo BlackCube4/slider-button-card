@@ -20,6 +20,7 @@
       "title": "Icon",
       "icon": "Icon (optional)",
       "show_icon": "Icon anzeigen",
+      "use_brightness": "Helligkeit benutzen",
       "tap_action": "Tap Aktion"
     },
     "slider": {

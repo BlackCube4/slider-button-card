@@ -35,6 +35,7 @@ export interface ActionButtonConfig {
 export interface IconConfig {
   icon?: string;
   show?: boolean;
+  use_brightness?: boolean;
   tap_action?: ActionConfig;
   color_mode?: ColorMode;
   color?: string;
@@ -49,7 +50,7 @@ export interface SliderConfig {
   attribute?: string;
   direction?: SliderDirection;
   background: SliderBackground;
-  use_percentage_bg_opacity?: boolean;
+  use_brightness?: boolean;
   color_mode?: ColorMode;
   color?: string;
   show_track?: boolean;
@@ -112,6 +113,7 @@ export const ActionButtonConfigDefault: ActionButtonConfig = {
 export const IconConfigDefault: IconConfig = {
   show: true,
   color_mode: ColorMode.DEFAULT,
+  use_brightness: true,
   tap_action: {
     action: 'more-info'
   },
@@ -120,7 +122,7 @@ export const IconConfigDefault: IconConfig = {
 export const SliderConfigDefault: SliderConfig = {
   direction: SliderDirection.LEFT_RIGHT,
   background: SliderBackground.SOLID,
-  use_percentage_bg_opacity: false,
+  use_brightness: false,
   color_mode: ColorMode.DEFAULT,
   show_track: false,
   disable_sliding: false,
@@ -135,7 +137,7 @@ export const SliderConfigDefaultDomain: Map<string, SliderConfig> = new Map([
     direction: SliderDirection.LEFT_RIGHT,
     background: SliderBackground.GRADIENT,
     color_mode: ColorMode.STATE,
-    use_percentage_bg_opacity: false,
+    use_brightness: false,
     show_track: false,
     disable_sliding: false,
     force_square: false,
@@ -148,7 +150,7 @@ export const SliderConfigDefaultDomain: Map<string, SliderConfig> = new Map([
     direction: SliderDirection.LEFT_RIGHT,
     background: SliderBackground.SOLID,
     color_mode: ColorMode.DEFAULT,
-    use_percentage_bg_opacity: false,
+    use_brightness: false,
     show_track: false,
     disable_sliding: false,
     force_square: false,
@@ -161,7 +163,7 @@ export const SliderConfigDefaultDomain: Map<string, SliderConfig> = new Map([
     direction: SliderDirection.LEFT_RIGHT,
     background: SliderBackground.SOLID,
     color_mode: ColorMode.DEFAULT,
-    use_percentage_bg_opacity: false,
+    use_brightness: false,
     show_track: false,
     disable_sliding: true,
     force_square: false,
@@ -174,7 +176,7 @@ export const SliderConfigDefaultDomain: Map<string, SliderConfig> = new Map([
     direction: SliderDirection.LEFT_RIGHT,
     background: SliderBackground.SOLID,
     color_mode: ColorMode.DEFAULT,
-    use_percentage_bg_opacity: false,
+    use_brightness: false,
     show_track: false,
     toggle_on_click: true,
     force_square: false,
@@ -186,7 +188,7 @@ export const SliderConfigDefaultDomain: Map<string, SliderConfig> = new Map([
     direction: SliderDirection.TOP_BOTTOM,
     background: SliderBackground.STRIPED,
     color_mode: ColorMode.DEFAULT,
-    use_percentage_bg_opacity: false,
+    use_brightness: false,
     disable_sliding: false,
     show_track: false,
     force_square: false,
@@ -200,7 +202,7 @@ export const SliderConfigDefaultDomain: Map<string, SliderConfig> = new Map([
     direction: SliderDirection.LEFT_RIGHT,
     background: SliderBackground.SOLID,
     color_mode: ColorMode.DEFAULT,
-    use_percentage_bg_opacity: false,
+    use_brightness: false,
     show_track: false,
     disable_sliding: false,
     force_square: false,
@@ -213,7 +215,7 @@ export const SliderConfigDefaultDomain: Map<string, SliderConfig> = new Map([
     direction: SliderDirection.LEFT_RIGHT,
     background: SliderBackground.SOLID,
     color_mode: ColorMode.DEFAULT,
-    use_percentage_bg_opacity: false,
+    use_brightness: false,
     show_track: false,
     toggle_on_click: false,
     force_square: false,
@@ -225,7 +227,7 @@ export const SliderConfigDefaultDomain: Map<string, SliderConfig> = new Map([
     direction: SliderDirection.LEFT_RIGHT,
     background: SliderBackground.TRIANGLE,
     color_mode: ColorMode.DEFAULT,
-    use_percentage_bg_opacity: false,
+    use_brightness: false,
     show_track: true,
     disable_sliding: false,
     force_square: false,
@@ -239,7 +241,7 @@ export const SliderConfigDefaultDomain: Map<string, SliderConfig> = new Map([
     direction: SliderDirection.LEFT_RIGHT,
     background: SliderBackground.SOLID,
     color_mode: ColorMode.DEFAULT,
-    use_percentage_bg_opacity: false,
+    use_brightness: false,
     show_track: false,
     disable_sliding: true,
     force_square: false,
@@ -252,7 +254,7 @@ export const SliderConfigDefaultDomain: Map<string, SliderConfig> = new Map([
     direction: SliderDirection.LEFT_RIGHT,
     background: SliderBackground.TRIANGLE,
     color_mode: ColorMode.DEFAULT,
-    use_percentage_bg_opacity: false,
+    use_brightness: false,
     show_track: true,
     disable_sliding: false,
     force_square: false,

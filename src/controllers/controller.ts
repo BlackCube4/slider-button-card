@@ -234,7 +234,7 @@ export abstract class Controller {
   }
 
   get iconFilter(): string {
-    if (this._config.icon?.color_mode !== 'state' || this.percentage === 0) {
+    if (this._config.icon?.use_brightness == false || this.percentage === 0) {
       return 'brightness(100%)';
     }
     return `brightness(${(this.percentage + 100) / 2}%)`;
@@ -253,7 +253,9 @@ export abstract class Controller {
           ? 'var(--paper-item-icon-active-color, #fdd835)'
           : 'var(--paper-item-icon-color, #44739e)';
       case 'custom':
-        return this._config.icon?.color || '';
+        return this.percentage > 0 
+          ? this._config.icon?.color || ''
+          : 'var(--paper-item-icon-color, #44739e)';
       default:
         return '';
     }
@@ -264,7 +266,7 @@ export abstract class Controller {
   }
 
   get sliderFilter(): string {
-    if (!this._config.slider?.use_percentage_bg_opacity || this.percentage === 0 || this._config.slider.background === SliderBackground.GRADIENT) {
+    if (!this._config.slider?.use_brightness || this.percentage === 0 || this._config.slider.background === SliderBackground.GRADIENT) {
       return 'brightness(100%)';
     }
     return `brightness(${(this.percentage + 100) / 2}%)`;
