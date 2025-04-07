@@ -29,6 +29,9 @@ export abstract class Controller {
   abstract _step?: number;
   abstract _invert?: boolean;
 
+  iconColorBackup: string = 'var(--paper-item-icon-color, #44739e)';
+  sliderColorBackup: string = 'var(--paper-item-icon-color, #44739e)';
+
   protected constructor(config: SliderButtonCardConfig) {
     this._config = config;
   }
@@ -245,17 +248,16 @@ export abstract class Controller {
       case 'state':
         if (this.stateObj.attributes.hs_color) {
           const [hue, sat] = this.stateObj.attributes.hs_color;
-          if (sat > 10) {
-            return `hsl(${hue}, 100%, ${100 - sat / 2}%)`;
-          }
+          this.iconColorBackup = `hsl(${hue}, 100%, ${100 - sat / 2}%)`;
+          return this.iconColorBackup;
         }
-        return this.percentage > 0 
-          ? 'var(--paper-item-icon-active-color, #fdd835)'
-          : 'var(--paper-item-icon-color, #44739e)';
+        return this.percentage == 0
+          ? 'var(--paper-item-icon-color, #44739e)'
+          : this.iconColorBackup;
       case 'custom':
-        return this.percentage > 0 
-          ? this._config.icon?.color || ''
-          : 'var(--paper-item-icon-color, #44739e)';
+        return this.percentage == 0 
+          ? 'var(--paper-item-icon-color, #44739e)'
+          : this._config.icon?.color || 'inherit';
       default:
         return '';
     }
@@ -273,31 +275,31 @@ export abstract class Controller {
   }
 
   get sliderColor(): string {
-    console.log("test", this._config.name, this._config.slider?.color_mode)
     switch(this._config.slider?.color_mode) {
       case 'state':
         if (this.stateObj.attributes.hs_color) {
           const [hue, sat] = this.stateObj.attributes.hs_color;
-          if (sat > 10) {
-            const color = `hsl(${hue}, 100%, ${100 - sat / 2}%)`;
-            return color;
-          }
+          this.sliderColorBackup = `hsl(${hue}, 100%, ${100 - sat / 2}%)`;
+          return this.sliderColorBackup;
         } else  if (
           this.stateObj.attributes.color_temp &&
           this.stateObj.attributes.min_mireds &&
           this.stateObj.attributes.max_mireds
         ) {
-          const color = getLightColorBasedOnTemperature(
+          this.sliderColorBackup = getLightColorBasedOnTemperature(
             this.stateObj.attributes.color_temp,
             this.stateObj.attributes.min_mireds,
             this.stateObj.attributes.max_mireds,
           );
-          return color;
+          return this.sliderColorBackup;
         }
-        return 'inherit';
-
+        return this.percentage == 0 && this._config.slider.background == SliderBackground.SOLID
+          ? 'var(--paper-item-icon-color, #44739e)'
+          : this.sliderColorBackup;
       case 'custom':
-        return this._config.slider?.color || 'inherit';
+        return this.percentage == 0 && this._config.slider.background == SliderBackground.SOLID
+          ? 'var(--paper-item-icon-color, #44739e)'
+          : this._config.slider?.color || 'inherit';
         
       default:
         return 'inherit';

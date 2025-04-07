@@ -1,5 +1,5 @@
 import { STATES_OFF } from 'custom-card-helpers';
-import { LightAttributes, LightColorModes } from '../types';
+import { SliderBackground, LightAttributes, LightColorModes } from '../types';
 import { getEnumValues, getLightColorBasedOnTemperature } from '../utils';
 import { Controller } from './controller';
 
@@ -253,7 +253,6 @@ export class LightController extends Controller {
   }
 
   get sliderColor(): string {
-    let returnColor = 'inherit';
     switch(this._config.slider?.color_mode) {
       case 'state':
         if (this.stateObj.attributes.hs_color && this.attribute !== LightAttributes.COLOR_TEMP) {
@@ -268,9 +267,8 @@ export class LightController extends Controller {
               useSat = this.percentage;
               break;
           }
-          if (useSat > 10) {
-            returnColor = `hsl(${useHue}, 100%, ${100 - useSat / 2}%)`;
-          }
+          this.sliderColorBackup = `hsl(${useHue}, 100%, ${100 - useSat / 2}%)`;
+          return this.sliderColorBackup;
         } else if (
           this.attribute === LightAttributes.HUE || this.attribute === LightAttributes.SATURATION
         ) {
@@ -284,30 +282,35 @@ export class LightController extends Controller {
               useSat = this.percentage;
               break;
           }
-          if (useSat > 10) {
-            returnColor = `hsl(${useHue}, 100%, ${100 - useSat / 2}%)`;
-          }
+          this.sliderColorBackup = `hsl(${useHue}, 100%, ${100 - useSat / 2}%)`;
+          return this.sliderColorBackup;
         } else if (
           this.stateObj.attributes.color_temp &&
           this.stateObj.attributes.min_mireds &&
           this.stateObj.attributes.max_mireds
         ) {
-          returnColor = getLightColorBasedOnTemperature(
+          this.sliderColorBackup = getLightColorBasedOnTemperature(
             this.attribute === LightAttributes.COLOR_TEMP ? this.valueFromPercentage : this.stateObj.attributes.color_temp,
             this.stateObj.attributes.min_mireds,
             this.stateObj.attributes.max_mireds
           );
+          return this.sliderColorBackup;
         } else if (this.attribute === LightAttributes.COLOR_TEMP) {
-          returnColor = getLightColorBasedOnTemperature(
+          this.sliderColorBackup = getLightColorBasedOnTemperature(
             this.valueFromPercentage,
             153,
             500
           );
+          return this.sliderColorBackup;
         }
-        return returnColor;
+        return this.percentage == 0 && this._config.slider.background == SliderBackground.SOLID
+          ? 'var(--paper-item-icon-color, #44739e)'
+          : this.sliderColorBackup;
 
       case 'custom':
-        return this._config.slider?.color || 'inherit';
+        return this.percentage == 0 && this._config.slider.background == SliderBackground.SOLID
+          ? 'var(--paper-item-icon-color, #44739e)'
+          : this._config.slider?.color || 'inherit';
         
       default:
         return 'inherit';
