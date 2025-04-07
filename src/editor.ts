@@ -55,7 +55,7 @@ export class SliderButtonCardEditor extends ScopedRegistryHost(LitElement) imple
 
   public async setConfig(config: SliderButtonCardConfig): Promise<void> {
     this._config = config;
-    setLanguage(this.hass); // Initialize language
+    setLanguage(this.hass);
   }
 
   protected shouldUpdate(): boolean {
@@ -147,7 +147,8 @@ export class SliderButtonCardEditor extends ScopedRegistryHost(LitElement) imple
     if (!this.hass) {
       return html``;
     }
-
+    setLanguage(this.hass);
+    
     return html`
       <div class="card-config">
         <div class="tabs">
@@ -309,7 +310,6 @@ export class SliderButtonCardEditor extends ScopedRegistryHost(LitElement) imple
                   ></mwc-switch>
                 </mwc-formfield>
               </div>
-
               <ha-selector
                 .hass=${this.hass}
                 .selector=${{
@@ -321,7 +321,28 @@ export class SliderButtonCardEditor extends ScopedRegistryHost(LitElement) imple
                 .configValue=${"slider.tap_action"}
                 @value-changed=${this._valueChangedSelect}
               ></ha-selector>
-
+              <ha-selector
+                .hass=${this.hass}
+                .selector=${{
+                  ui_action: {}
+                }}
+                .label="${localize('hold_action')}"
+                .value=${this._slider.hold_action}
+                .required=${false}
+                .configValue=${"slider.hold_action"}
+                @value-changed=${this._valueChangedSelect}
+              ></ha-selector>
+              <ha-selector
+                .hass=${this.hass}
+                .selector=${{
+                  ui_action: {}
+                }}
+                .label="${localize('double_tap_action')}"
+                .value=${this._slider.double_tap_action}
+                .required=${false}
+                .configValue=${"slider.double_tap_action"}
+                @value-changed=${this._valueChangedSelect}
+              ></ha-selector>
             </div>
           </div>
           
@@ -563,7 +584,7 @@ export class SliderButtonCardEditor extends ScopedRegistryHost(LitElement) imple
         transform: rotate(90deg);
       }
       input.tab-checkbox:checked ~ .tab-content {
-        max-height: 100vh;
+        max-height: none;
         padding: 1em;
       }      
     `;

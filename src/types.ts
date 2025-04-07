@@ -30,15 +30,19 @@ export interface ActionButtonConfig {
   show?: boolean;
   show_spinner?: boolean;
   tap_action?: ActionConfig;
+  hold_action?: ActionConfig;
+  double_tap_action?: ActionConfig;
 }
 
 export interface IconConfig {
   icon?: string;
   show?: boolean;
   use_brightness?: boolean;
-  tap_action?: ActionConfig;
   color_mode?: ColorMode;
   color?: string;
+  tap_action?: ActionConfig;
+  hold_action?: ActionConfig;
+  double_tap_action?: ActionConfig;
 }
 
 export interface SliderConfig {
@@ -58,6 +62,8 @@ export interface SliderConfig {
   invert?: boolean;
   force_square: boolean;
   tap_action?: ActionConfig;
+  hold_action?: ActionConfig;
+  double_tap_action?: ActionConfig;
 }
 
 export enum ActionButtonMode {

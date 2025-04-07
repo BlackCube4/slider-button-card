@@ -93,10 +93,13 @@ class ActionHandler extends HTMLElement implements ActionHandler {
         y = (ev as MouseEvent).pageY;
       }
 
-      this.timer = window.setTimeout(() => {
-        this.startAnimation(x, y);
-        this.held = true;
-      }, this.holdTime);
+      if (options.hasHold) {
+        this.timer = window.setTimeout(() => {
+          this.startAnimation(x, y);
+          this.held = true;
+          fireEvent(element, 'action', { action: 'hold' });
+        }, this.holdTime);
+      }
     };
 
     const end = (ev: Event): void => {
@@ -108,9 +111,8 @@ class ActionHandler extends HTMLElement implements ActionHandler {
       clearTimeout(this.timer);
       this.stopAnimation();
       this.timer = undefined;
-      if (this.held) {
-        fireEvent(element, 'action', { action: 'hold' });
-      } else if (options.hasDoubleClick) {
+      if (this.held) {return}
+      if (options.hasDoubleClick) {
         if ((ev.type === 'click' && (ev as MouseEvent).detail < 2) || !this.dblClickTimeout) {
           this.dblClickTimeout = window.setTimeout(() => {
             this.dblClickTimeout = undefined;

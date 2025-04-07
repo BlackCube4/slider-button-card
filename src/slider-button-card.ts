@@ -47,7 +47,6 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
   private hasSlid = false;
 
   private readonly DEADZONE_THRESHOLD = 15; // pixels
-  private startTime;
   private startX = 0;
   private startY = 0;
 
@@ -166,8 +165,8 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
           <div class="slider"
                @action=${ (e): void => this._sliderAction(e, this.config.slider)}
                 .actionHandler=${actionHandler({
-                  hasHold: false,
-                  hasDoubleClick: false,
+                  hasHold: true,
+                  hasDoubleClick: true,
                 })}
                data-show-track="${this.config.slider?.show_track}"
                data-mode="${this.config.slider?.direction}"
@@ -178,21 +177,73 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
                @pointerup=${this.onPointerUp}
                @pointercancel=${this.onPointerCancel}
           >
-
             ${this.ctrl.disableSliding //keeping this for the CSS cursor change
               ? html`
                 <div class="toggle-overlay"></div>
                 `
               : ''}
-
             <div class="slider-bg"></div>
             <div class="slider-thumb"></div>           
           </div>
+          ${this.renderScrollHelper()}
           ${this.renderAction()}
           ${this.renderIcon()}
           ${this.renderText()}
         </div>
       </ha-card>
+    `;
+  }
+
+  private renderScrollHelper(): TemplateResult {
+    const isVertical = this.config.slider?.direction === SliderDirection.TOP_BOTTOM
+      || this.config.slider?.direction === SliderDirection.BOTTOM_TOP;
+    
+    if (isVertical)
+      return html`<div class="mobile-vertical-scroll-helper"></div>`
+    else
+      return html``
+  }
+
+  private renderIcon(): TemplateResult {
+    if (this.config.icon?.show === false) {
+      return html``;
+    }
+    let hasPicture = false;
+    let backgroundImage = '';
+    if (this.ctrl.stateObj.attributes.entity_picture) {
+      backgroundImage = `url(${this.ctrl.stateObj.attributes.entity_picture})`;
+      hasPicture = true;
+    }
+
+    // Check if all actions are undefined or 'none'
+    const iconConfig = this.config.icon || {};
+    const noAction = (
+      (!iconConfig.tap_action || iconConfig.tap_action.action === 'none') &&
+      (!iconConfig.hold_action || iconConfig.hold_action.action === 'none') &&
+      (!iconConfig.double_tap_action || iconConfig.double_tap_action.action === 'none')
+    );
+
+    return html`
+      <div class="icon ${classMap({ 'has-picture': hasPicture, 'no-action': noAction })}"
+           @action=${ (e): void => this._handleAction(e, this.config.icon)}
+           .actionHandler=${actionHandler({
+             hasHold: false,
+             hasDoubleClick: false,
+           })}
+           style=${styleMap({
+             'background-image': `${backgroundImage}`,
+           })}
+           >
+        <icon-background></icon-background>
+        <ha-icon
+          tabindex="-1"
+          data-domain=${computeStateDomain(this.ctrl.stateObj)}
+          data-state=${ifDefined(
+            this.ctrl.stateObj ? this.ctrl.state : undefined
+          )}          
+          .icon=${this.ctrl.icon}
+        />
+      </div>
     `;
   }
 
@@ -234,40 +285,6 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
                 : ''}
               </span>
           </div>
-    `;
-  }
-
-  private renderIcon(): TemplateResult {
-    if (this.config.icon?.show === false) {
-      return html``;
-    }
-    let hasPicture = false;
-    let backgroundImage = '';
-    if (this.ctrl.stateObj.attributes.entity_picture) {
-      backgroundImage = `url(${this.ctrl.stateObj.attributes.entity_picture})`;
-      hasPicture = true;
-    }
-    return html`
-      <div class="icon ${classMap({ 'has-picture': hasPicture })}"
-           @action=${ (e): void => this._handleAction(e, this.config.icon)}
-           .actionHandler=${actionHandler({
-             hasHold: false,
-             hasDoubleClick: false,
-           })}
-           style=${styleMap({
-             'background-image': `${backgroundImage}`,
-           })}
-           >
-        <icon-background></icon-background>
-        <ha-icon
-          tabindex="-1"
-          data-domain=${computeStateDomain(this.ctrl.stateObj)}
-          data-state=${ifDefined(
-            this.ctrl.stateObj ? this.ctrl.state : undefined
-          )}          
-          .icon=${this.ctrl.icon}
-        />
-      </div>
     `;
   }
 
@@ -319,9 +336,24 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
   }
 
   private _sliderAction(ev: ActionHandlerEvent, config): void {
-    if (this.hasSlid || Date.now() - this.startTime >= 200){return;}
+    if (this.hasSlid){return;}
     if (this.hass && this.config && ev.detail.action) {
-      if (config.tap_action?.action === 'toggle' && !this.ctrl.isUnavailable) {
+      let actionConfig;
+      switch(ev.detail.action) {
+        case 'hold':
+          console.log("hold");
+          actionConfig = config.hold_action || config.tap_action;
+          break;
+        case 'double_tap':
+          console.log("double_tap");
+          actionConfig = config.double_tap_action || config.tap_action;
+          break;
+        default:
+          console.log("default");
+          actionConfig = config.tap_action;
+      }
+  
+      if (actionConfig?.action === 'toggle' && !this.ctrl.isUnavailable) {
         this.animateActionStart();
       }
       handleAction(this, this.hass, {...config, entity: this.config.entity}, ev.detail.action);
@@ -423,7 +455,6 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
     // eslint-disable-next-line prefer-const
     oldPercentage = this.ctrl.originalValue;
 
-    this.startTime = Date.now();
     this.startX = event.clientX;
     this.startY = event.clientY;
   }
@@ -562,8 +593,8 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
       transition: all 0.2s ease-in-out;
       touch-action: pan-y;
     }
-    .button[data-mode="top-bottom"],
-    .button[data-mode="bottom-top"] {
+    .slider[data-mode="top-bottom"],
+    .slider[data-mode="bottom-top"] {
       touch-action: none;
     }
     ha-card.compact .button {
@@ -608,6 +639,9 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
     }
     .icon.has-picture ha-icon{
       display: none;
+    }
+    .icon.no-action{
+      pointer-events: none;
     }
     .unavailable .icon ha-icon {
       color: var(--disabled-text-color);
@@ -934,7 +968,20 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
         stroke-dasharray: 89, 200;
         stroke-dashoffset: -124;
       }
-    }     
+    }
+    
+    .mobile-vertical-scroll-helper {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 50%;
+      height: 100%;
+    }
+    @media (hover: hover) {
+      .mobile-vertical-scroll-helper {
+        pointer-events: none;
+      }
+    }
     `;
   }
 }

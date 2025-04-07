@@ -68,5 +68,7 @@
   },
 
   "use_brightness": "Helligkeit benutzen",
-  "tap_action": "Tap Aktion"
+  "tap_action": "Tippaktion",
+  "hold_action": "Hold Aktion",
+  "double_tap_action": "Doppeltipp-Aktion"
 }
