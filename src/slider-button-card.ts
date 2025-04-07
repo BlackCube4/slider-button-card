@@ -489,11 +489,11 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
     let newPercentage = this.ctrl.originalValue - delta;
     newPercentage = normalize(newPercentage, this.ctrl.min, this.ctrl.max)
 
-    console.log('oldPercentage', this.ctrl.originalValue);
-    console.log('clickPosition', clickPosition);
-    console.log('onPointerMove', percentage);
-    console.log('delta', delta);
-    console.log('newPercentage', newPercentage);
+    //console.log('oldPercentage', this.ctrl.originalValue);
+    //console.log('clickPosition', clickPosition);
+    //console.log('onPointerMove', percentage);
+    //console.log('delta', delta);
+    //console.log('newPercentage', newPercentage);
 
     this.updateValue(newPercentage);
   }

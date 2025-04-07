@@ -226,7 +226,7 @@ export class SliderButtonCardEditor extends ScopedRegistryHost(LitElement) imple
                     @change=${this._valueChanged}
                   ></mwc-switch>
                 </mwc-formfield>
-                <mwc-formfield label="${localize('tabs.icon.use_brightness')}">
+                <mwc-formfield label="${localize('use_brightness')}">
                   <mwc-switch
                     .checked=${this._icon.use_brightness}
                     .configValue=${'icon.use_brightness'}
@@ -309,6 +309,19 @@ export class SliderButtonCardEditor extends ScopedRegistryHost(LitElement) imple
                   ></mwc-switch>
                 </mwc-formfield>
               </div>
+
+              <ha-selector
+                .hass=${this.hass}
+                .selector=${{
+                  ui_action: {}
+                }}
+                .label="${localize('tap_action')}"
+                .value=${this._slider.tap_action}
+                .required=${false}
+                .configValue=${"slider.tap_action"}
+                @value-changed=${this._valueChangedSelect}
+              ></ha-selector>
+
             </div>
           </div>
           
@@ -384,7 +397,7 @@ export class SliderButtonCardEditor extends ScopedRegistryHost(LitElement) imple
   protected renderBrightness(path: string): TemplateResult | void {
     const item = this[`_${path}`];
     return html`
-      <mwc-formfield .label=${localize('tabs.slider.use_brightness')}>
+      <mwc-formfield .label=${localize('use_brightness')}>
         <mwc-switch
           .checked=${item.use_brightness}
           .configValue="${path}.use_brightness"

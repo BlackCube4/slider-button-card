@@ -100,11 +100,32 @@ export enum Domain {
   AUTOMATION = 'automation',
 }
 
+export enum LightAttributes {
+  COLOR_TEMP = 'color_temp',
+  BRIGHTNESS = 'brightness',
+  BRIGHTNESS_PCT = 'brightness_pct',
+  HUE = 'hue',
+  SATURATION = 'saturation',
+  ON_OFF = 'onoff',
+}
+
+export enum LightColorModes {
+  COLOR_TEMP = 'color_temp',
+  BRIGHTNESS = 'brightness',
+  HS = 'hs',
+  ON_OFF = 'onoff',
+}
+
+export enum CoverAttributes {
+  POSITION = 'position',
+  TILT = 'tilt',
+}
+
 export const ActionButtonConfigDefault: ActionButtonConfig = {
   mode: ActionButtonMode.TOGGLE,
   icon: 'mdi:power',
-  show: true,
-  show_spinner: true,
+  show: false,
+  show_spinner: false,
   tap_action: {
     action: 'toggle'
   },
@@ -113,7 +134,7 @@ export const ActionButtonConfigDefault: ActionButtonConfig = {
 export const IconConfigDefault: IconConfig = {
   show: true,
   color_mode: ColorMode.DEFAULT,
-  use_brightness: true,
+  use_brightness: false,
   tap_action: {
     action: 'more-info'
   },
@@ -137,7 +158,7 @@ export const SliderConfigDefaultDomain: Map<string, SliderConfig> = new Map([
     direction: SliderDirection.LEFT_RIGHT,
     background: SliderBackground.GRADIENT,
     color_mode: ColorMode.STATE,
-    use_brightness: false,
+    use_brightness: true,
     show_track: false,
     disable_sliding: false,
     force_square: false,
@@ -264,24 +285,3 @@ export const SliderConfigDefaultDomain: Map<string, SliderConfig> = new Map([
     },
   }],
 ]);
-
-export enum LightAttributes {
-  COLOR_TEMP = 'color_temp',
-  BRIGHTNESS = 'brightness',
-  BRIGHTNESS_PCT = 'brightness_pct',
-  HUE = 'hue',
-  SATURATION = 'saturation',
-  ON_OFF = 'onoff',
-}
-
-export enum LightColorModes {
-  COLOR_TEMP = 'color_temp',
-  BRIGHTNESS = 'brightness',
-  HS = 'hs',
-  ON_OFF = 'onoff',
-}
-
-export enum CoverAttributes {
-  POSITION = 'position',
-  TILT = 'tilt',
-}

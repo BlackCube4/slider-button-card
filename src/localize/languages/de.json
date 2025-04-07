@@ -19,9 +19,7 @@
     "icon": {
       "title": "Icon",
       "icon": "Icon (optional)",
-      "show_icon": "Icon anzeigen",
-      "use_brightness": "Helligkeit benutzen",
-      "tap_action": "Tap Aktion"
+      "show_icon": "Icon anzeigen"
     },
     "slider": {
       "title": "Schieberegler",
@@ -29,19 +27,16 @@
       "background": "Hintergrund",
       "min_value": "Min",
       "max_value": "Max",
-      "use_brightness": "Helligkeit benutzen",
       "show_track": "Spur anzeigen",
       "disable_sliding": "Schieben deaktivieren",
-      "force_square": "Quadrat erzwingen",
-      "tap_action": "Tap Aktion"
+      "force_square": "Quadrat erzwingen"
     },
     "action_button": {
       "title": "Action-Knopf",
       "mode": "Modus",
       "icon": "Icon",
       "show_button": "Knopf anzeigen",
-      "show_spinner": "Spinner anzeigen",
-      "tap_action": "Tap Aktion"
+      "show_spinner": "Spinner anzeigen"
     }
   },
   "state": {
@@ -70,5 +65,8 @@
     "default": "Standard-Farbe",
     "state": "Zustandsfarbe",
     "custom": "Benutzerdefinierte Farbe"
-  }
+  },
+
+  "use_brightness": "Helligkeit benutzen",
+  "tap_action": "Tap Aktion"
 }

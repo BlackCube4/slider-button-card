@@ -19,9 +19,7 @@
     "icon": {
       "title": "Icon",
       "icon": "Icon (Optional)",
-      "show_icon": "Show icon",
-      "use_brightness": "Use brightness",
-      "tap_action": "Tap action"
+      "show_icon": "Show icon"
     },
     "slider": {
       "title": "Slider",
@@ -29,19 +27,16 @@
       "background": "Background",
       "min_value": "Min",
       "max_value": "Max",
-      "use_brightness": "Use brightness",
       "show_track": "Show track",
       "disable_sliding": "Disable Sliding",
-      "force_square": "Force square",
-      "tap_action": "Tap Action"
+      "force_square": "Force square"
     },
     "action_button": {
       "title": "Action button",
       "mode": "Mode",
       "icon": "Icon",
       "show_button": "Show button",
-      "show_spinner": "Show spinner",
-      "tap_action": "Tap action"
+      "show_spinner": "Show spinner"
     }
   },
   "state": {
@@ -70,5 +65,8 @@
     "default": "Default theme",
     "state": "State color",
     "custom": "Custom color"
-  }
+  },
+
+  "tap_action": "Tap action",
+  "use_brightness": "Use brightness"
 }
