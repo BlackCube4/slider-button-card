@@ -1,13 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/camelcase */
 import copy from 'fast-copy';
-import {
-  CSSResult,
-  LitElement,
-  TemplateResult,
-  css,
-  html
-} from 'lit';
+import { CSSResult, LitElement, TemplateResult, css, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 
 import { formfieldDefinition } from '../elements/formfield';
@@ -16,7 +10,7 @@ import { textfieldDefinition } from '../elements/textfield';
 
 import { ScopedRegistryHost } from '@lit-labs/scoped-registry-mixin';
 import { ActionConfig, HomeAssistant, LovelaceCardEditor, computeDomain, fireEvent } from 'custom-card-helpers';
-import { localize } from './localize/localize';
+import { localize, setLanguage } from './localize/localize';
 import { ActionButtonConfig, ActionButtonConfigDefault, ActionButtonMode, Domain, IconConfig, IconConfigDefault, SliderBackground, SliderButtonCardConfig, SliderConfig, SliderConfigDefault, SliderDirection, ColorMode } from './types';
 import { applyPatch, getEnumValues, getSliderDefaultForEntity } from './utils';
 
@@ -61,6 +55,7 @@ export class SliderButtonCardEditor extends ScopedRegistryHost(LitElement) imple
 
   public async setConfig(config: SliderButtonCardConfig): Promise<void> {
     this._config = config;
+    setLanguage(this.hass); // Initialize language
   }
 
   protected shouldUpdate(): boolean {

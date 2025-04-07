@@ -24,13 +24,21 @@ const languages: any = {
   sk: sk,
 };
 
-export function localize(string: string, search = '', replace = ''): string {
-  const lang = (localStorage.getItem('selectedLanguage') || 'en').replace(/['"]+/g, '').replace('-', '_');
+let currentLanguage = 'en';
 
+export function setLanguage(hass?: { language: string }): void {
+  if (hass?.language) {
+    currentLanguage = hass.language.split('-')[0];
+  } else {
+    currentLanguage = localStorage.getItem('selectedLanguage')?.replace(/['"-_]+/g, '') || 'en';
+  }
+}
+
+export function localize(string: string, search = '', replace = ''): string {
   let translated: string;
 
   try {
-    translated = string.split('.').reduce((o, i) => o[i], languages[lang]);
+    translated = string.split('.').reduce((o, i) => o[i], languages[currentLanguage]);
   } catch (e) {
     translated = string.split('.').reduce((o, i) => o[i], languages['en']);
   }

@@ -10,7 +10,7 @@ import { CARD_VERSION } from './const';
 import { Controller } from './controllers/controller';
 import { ControllerFactory } from './controllers/get-controller';
 import './editor';
-import { localize } from './localize/localize';
+import { localize, setLanguage } from './localize/localize';
 
 import type { SliderButtonCardConfig } from './types';
 import { ActionButtonConfigDefault, ActionButtonMode, IconConfigDefault, SliderDirection } from './types';
@@ -46,7 +46,8 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
   private actionTimeout;
   private hasSlid = false;
 
-  private readonly DEADZONE_THRESHOLD = 10; // pixels
+  private readonly DEADZONE_THRESHOLD = 15; // pixels
+  private startTime;
   private startX = 0;
   private startY = 0;
 
@@ -98,6 +99,8 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
       ...config
     };
     this.ctrl = ControllerFactory.getInstance(this.config);
+    
+    setLanguage(this.hass); // Initialize language
   }
 
   protected shouldUpdate(changedProps: PropertyValues): boolean {
@@ -316,7 +319,7 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
   }
 
   private _sliderAction(ev: ActionHandlerEvent, config): void {
-    if (this.hasSlid){return;}
+    if (this.hasSlid || Date.now() - this.startTime >= 200){return;}
     if (this.hass && this.config && ev.detail.action) {
       if (config.tap_action?.action === 'toggle' && !this.ctrl.isUnavailable) {
         this.animateActionStart();
@@ -336,7 +339,6 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
     this.ctrl.log('setStateValue', value);
     this.updateValue(value, false);
     this.ctrl.value = value;
-    //this.animateActionStart();
   }
 
   private animateActionStart(): void {
@@ -399,17 +401,6 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
     `;
   }
 
-  private getColorFromVariable(color: string): string {
-    if (typeof color !== 'undefined' && color.substring(0, 3) === 'var') {
-      let varColor = window.getComputedStyle(this).getPropertyValue(color.substring(4).slice(0, -1)).trim();
-      if (!varColor.length) {
-        varColor = window.getComputedStyle(document.documentElement).getPropertyValue(color.substring(4).slice(0, -1)).trim();
-      }
-      return varColor
-    }
-    return color;
-  }
-
   @eventOptions({passive: true})
   private onPointerDown(event: PointerEvent): void {
     if (this.config.slider?.direction === SliderDirection.TOP_BOTTOM
@@ -432,6 +423,7 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
     // eslint-disable-next-line prefer-const
     oldPercentage = this.ctrl.originalValue;
 
+    this.startTime = Date.now();
     this.startX = event.clientX;
     this.startY = event.clientY;
   }
@@ -455,6 +447,8 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
       }
     this.updateValue(this.ctrl.value, false);
     this.slider.releasePointerCapture(event.pointerId);
+    this.ctrl.originalValueLock = false;
+    this.ctrl.clickPositionLock = false;
   }
 
   @eventOptions({passive: true})
