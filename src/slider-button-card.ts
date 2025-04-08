@@ -145,6 +145,7 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
       return this._showError(localize('common.show_error'));
     }
     return html`
+    <div style="overflow:hidden">
       <ha-card
         tabindex="0"
         .label=${`SliderButton: ${this.config.entity || 'No Entity Defined'}`}
@@ -191,6 +192,7 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
           ${this.renderText()}
         </div>
       </ha-card>
+    </div>
     `;
   }
 
@@ -548,7 +550,7 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
       justify-content: space-between;
       touch-action: pan-y;
       background: var(--ha-card-border-color,var(--divider-color,#e0e0e0));;
-      overflow: hidden;         /* still needed or else the slider will trigger scroll bar when it leaves hui-view even though it's invisible */
+      /* overflow: hidden;         still needed or else the slider will trigger scroll bar when it leaves hui-view even though it's invisible */
       line-height: 0;
     }
     ha-card.square {
@@ -718,6 +720,7 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
       font-weight: 400;
       font-size: 12px;
       line-height: 16px;
+      height: 16px;
       letter-spacing: .4px;
       display: block;
       overflow: hidden;
@@ -815,11 +818,11 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
       --slider-bg-direction: to bottom;      
     }
     
-    /* --- SLIDER THUMB --- */        
+    /* --- SLIDER THUMB --- */
     
     .slider-thumb {
       position: relative;
-      width: 100%;
+      width: 100.5%;  /* + 0.5 firefox... */
       height: 100%;      
       transform: translateX(var(--slider-value));
       background: transparent;
