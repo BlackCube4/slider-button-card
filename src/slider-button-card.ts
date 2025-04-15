@@ -823,7 +823,7 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
     .slider-thumb {
       position: relative;
       width: 100.5%;  /* + 0.5 firefox... */
-      height: 100%;      
+      height: 100.5%;      
       transform: translateX(var(--slider-value));
       background: transparent;
       transition: transform var(--slider-transition-duration);
@@ -977,7 +977,7 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
       position: absolute;
       top: 0;
       left: 0;
-      width: 50%;
+      width: 56px;
       height: 100%;
     }
     @media (hover: hover) {
