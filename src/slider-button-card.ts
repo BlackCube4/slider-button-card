@@ -145,7 +145,6 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
       return this._showError(localize('common.show_error'));
     }
     return html`
-    <div style="overflow:hidden">
       <ha-card
         tabindex="0"
         .label=${`SliderButton: ${this.config.entity || 'No Entity Defined'}`}
@@ -192,7 +191,6 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
           ${this.renderText()}
         </div>
       </ha-card>
-    </div>
     `;
   }
 
