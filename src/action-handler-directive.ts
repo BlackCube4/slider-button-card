@@ -3,12 +3,10 @@ import { directive, PropertyPart } from 'lit-html';
 import { ActionHandlerDetail, ActionHandlerOptions } from 'custom-card-helpers/dist/types';
 import { fireEvent } from 'custom-card-helpers';
 
-const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
-
 const MAX_CLICK_TIME = 250;
 const HOLD_TIME = 500;
 const MAX_HOLD_DISTANCE = 10;
-const MIN_DRAG_DISTANCE = 15;
+const MIN_DRAG_DISTANCE = 5;
 const DOUBLE_CLICK_DELAY = 250;
 
 let startX = 0;
@@ -35,7 +33,6 @@ class ActionHandler extends HTMLElement implements ActionHandler {
   public holdTime = 500;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public ripple: any;
 
   protected timer?: number;
 
@@ -45,21 +42,17 @@ class ActionHandler extends HTMLElement implements ActionHandler {
 
   constructor() {
     super();
-    this.ripple = document.createElement('mwc-ripple');
   }
 
   public connectedCallback(): void {
     Object.assign(this.style, {
       position: 'absolute',
-      width: isTouch ? '100px' : '50px',
-      height: isTouch ? '100px' : '50px',
+      width: '50px',
+      height: '50px',
       transform: 'translate(-50%, -50%)',
       pointerEvents: 'none',
       zIndex: '999',
     });
-
-    this.appendChild(this.ripple);
-    this.ripple.primary = true;
 
     ['touchcancel', 'mouseout', 'mouseup', 'touchmove', 'mousewheel', 'wheel', 'scroll'].forEach(ev => {
       document.addEventListener(
@@ -186,14 +179,9 @@ class ActionHandler extends HTMLElement implements ActionHandler {
       top: `${y}px`,
       display: null,
     });
-    this.ripple.disabled = false;
-    this.ripple.active = true;
-    this.ripple.unbounded = true;
   }
 
   private stopAnimation(): void {
-    this.ripple.active = false;
-    this.ripple.disabled = true;
     this.style.display = 'none';
   }
 }
