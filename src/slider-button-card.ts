@@ -50,6 +50,8 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
   private startX = 0;
   private startY = 0;
 
+  private lastPointerId: number | null = null;
+
   public static async getConfigElement(): Promise<LovelaceCardEditor> {
     return document.createElement('slider-button-card-editor');
   }
@@ -145,52 +147,52 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
       return this._showError(localize('common.show_error'));
     }
     return html`
-      <ha-card
-        tabindex="0"
-        .label=${`SliderButton: ${this.config.entity || 'No Entity Defined'}`}
-        class="${classMap({ 'square': this.config.slider?.force_square || false, 'hide-name': !this.config.show_name, 'hide-state': !this.config.show_state, 'hide-action': !this.config.action_button?.show , 'compact': this.config.compact === true })}"
-        data-mode="${this.config.slider?.direction}"
-      >
-        <div class="button
-              ${classMap({ off: this.ctrl.isOff, unavailable: this.ctrl.isUnavailable })}"
-              data-mode="${this.config.slider?.direction}"
-              style=${styleMap({
-                '--slider-value': `${this.ctrl.percentage}%`,
-                '--slider-bg-filter': this.ctrl.style.slider.filter,
-                '--slider-color': this.ctrl.style.slider.color,
-                '--icon-filter': this.ctrl.style.icon.filter,
-                '--icon-color': this.ctrl.style.icon.color,
-              })}
-             >
-          <div class="slider"
-               @action=${ (e): void => this._sliderAction(e, this.config.slider)}
+      <overflow_fix>
+        <ha-card
+          tabindex="0"
+          .label=${`SliderButton: ${this.config.entity || 'No Entity Defined'}`}
+          class="${classMap({ 'square': this.config.slider?.force_square || false, 'hide-name': !this.config.show_name, 'hide-state': !this.config.show_state, 'hide-action': !this.config.action_button?.show , 'compact': this.config.compact === true })}"
+          data-mode="${this.config.slider?.direction}"
+        >
+          <div class="button
+            ${classMap({ off: this.ctrl.isOff, unavailable: this.ctrl.isUnavailable })}"
+            data-mode="${this.config.slider?.direction}"
+            style=${styleMap({
+              '--slider-value': `${this.ctrl.percentage}%`,
+              '--slider-bg-filter': this.ctrl.style.slider.filter,
+              '--slider-color': this.ctrl.style.slider.color,
+              '--icon-filter': this.ctrl.style.icon.filter,
+              '--icon-color': this.ctrl.style.icon.color,
+            })}
+          >
+            <div class="slider"
+              @action=${ (e): void => this._sliderAction(e, this.config.slider)}
                 .actionHandler=${actionHandler({
                   hasHold: true,
-                  hasDoubleClick: true,
+                  hasDoubleClick: !!this.config.slider?.double_tap_action && this.config.slider.double_tap_action.action !== 'none'
                 })}
-               data-show-track="${this.config.slider?.show_track}"
-               data-mode="${this.config.slider?.direction}"
-               data-background="${this.config.slider?.background}"
-               data-disable-sliding="${this.ctrl.disableSliding}"
-               @pointerdown=${this.onPointerDown}
-               @pointermove=${this.onPointerMove}
-               @pointerup=${this.onPointerUp}
-               @pointercancel=${this.onPointerCancel}
-          >
-            ${this.ctrl.disableSliding //keeping this for the CSS cursor change
-              ? html`
-                <div class="toggle-overlay"></div>
-                `
-              : ''}
-            <div class="slider-bg"></div>
-            <div class="slider-thumb"></div>           
+              data-show-track="${this.config.slider?.show_track}"
+              data-mode="${this.config.slider?.direction}"
+              data-background="${this.config.slider?.background}"
+              data-disable-sliding="${this.ctrl.disableSliding}"
+              @pointerdown=${this.onPointerDown}
+              @pointermove=${this.onPointerMove}
+              @pointerup=${this.onPointerUp}
+              @pointercancel=${this.onPointerCancel}
+            >
+              ${this.ctrl.disableSliding //keeping this for the CSS cursor change
+                ? html`<div class="toggle-overlay"></div>`
+                : ''}
+              <div class="slider-bg"></div>
+              <div class="slider-thumb"></div>           
+            </div>
+            ${this.renderScrollHelper()}
+            ${this.renderAction()}
+            ${this.renderIcon()}
+            ${this.renderText()}
           </div>
-          ${this.renderScrollHelper()}
-          ${this.renderAction()}
-          ${this.renderIcon()}
-          ${this.renderText()}
-        </div>
-      </ha-card>
+        </ha-card>
+      </overflow_fix>
     `;
   }
 
@@ -342,11 +344,14 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
       switch(ev.detail.action) {
         case 'hold':
           console.log("hold");
-          actionConfig = config.hold_action || config.tap_action;
+          try {
+            this.slider.releasePointerCapture?.(this.lastPointerId);
+          } catch (e) {}
+          actionConfig = config.hold_action;
           break;
         case 'double_tap':
           console.log("double_tap");
-          actionConfig = config.double_tap_action || config.tap_action;
+          actionConfig = config.double_tap_action;
           break;
         default:
           console.log("default");
@@ -443,6 +448,7 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
     if (this.ctrl.isSliderDisabled) {
       return;
     }
+    this.lastPointerId = event.pointerId;
     this.slider.setPointerCapture(event.pointerId);
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -451,10 +457,11 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
       this.ctrl.originalValue = this.ctrl.value;
       this.ctrl.originalValueLock = true;
     }
-    this.hasSlid = false;
+    
     // eslint-disable-next-line prefer-const
     oldPercentage = this.ctrl.originalValue;
 
+    this.hasSlid = false;
     this.startX = event.clientX;
     this.startY = event.clientY;
   }
@@ -465,6 +472,7 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
       return;
     }
 
+    this.hasSlid = false;
     this.setStateValue(this.ctrl.targetValue);
     this.slider.releasePointerCapture(event.pointerId);
     this.ctrl.originalValueLock = false;
@@ -476,6 +484,7 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
       || this.config.slider?.direction === SliderDirection.BOTTOM_TOP) {
         return;
       }
+    this.hasSlid = false;
     this.updateValue(this.ctrl.value, false);
     this.slider.releasePointerCapture(event.pointerId);
     this.ctrl.originalValueLock = false;
@@ -484,7 +493,7 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
 
   @eventOptions({passive: true})
   private onPointerMove(event: any): void {
-    if (this.ctrl.isSliderDisabled) {
+    if (this.ctrl.isSliderDisabled  || !this.slider.hasPointerCapture(event.pointerId)) {
       return;
     }
 
@@ -499,34 +508,35 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
       this.hasSlid = true;
     }
     
-    if (!this.slider.hasPointerCapture(event.pointerId)) return;
-    const {left, top, width, height} = this.slider.getBoundingClientRect();
-    this.ctrl.log('event', event);
+    if (this.hasSlid) {
+      const {left, top, width, height} = this.slider.getBoundingClientRect();
+      this.ctrl.log('event', event);
 
-    const percentage = this.ctrl.moveSlider(event, {left, top, width, height});
+      const percentage = this.ctrl.moveSlider(event, {left, top, width, height});
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    let clickPosition;
-    if (this.ctrl.clickPositionLock != true)
-    {
-      this.ctrl.clickPosition = percentage;
-      this.ctrl.clickPositionLock = true;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      let clickPosition;
+      if (this.ctrl.clickPositionLock != true)
+      {
+        this.ctrl.clickPosition = percentage;
+        this.ctrl.clickPositionLock = true;
+      }
+      // eslint-disable-next-line prefer-const
+      clickPosition = this.ctrl.clickPosition;
+
+      // eslint-disable-next-line prefer-const
+      let delta = this.ctrl.clickPosition - percentage;
+      let newPercentage = this.ctrl.originalValue - delta;
+      newPercentage = normalize(newPercentage, this.ctrl.min, this.ctrl.max)
+
+      //console.log('oldPercentage', this.ctrl.originalValue);
+      //console.log('clickPosition', clickPosition);
+      //console.log('onPointerMove', percentage);
+      //console.log('delta', delta);
+      //console.log('newPercentage', newPercentage);
+
+      this.updateValue(newPercentage);
     }
-    // eslint-disable-next-line prefer-const
-    clickPosition = this.ctrl.clickPosition;
-
-    // eslint-disable-next-line prefer-const
-    let delta = this.ctrl.clickPosition - percentage;
-    let newPercentage = this.ctrl.originalValue - delta;
-    newPercentage = normalize(newPercentage, this.ctrl.min, this.ctrl.max)
-
-    //console.log('oldPercentage', this.ctrl.originalValue);
-    //console.log('clickPosition', clickPosition);
-    //console.log('onPointerMove', percentage);
-    //console.log('delta', delta);
-    //console.log('newPercentage', newPercentage);
-
-    this.updateValue(newPercentage);
   }
 
   connectedCallback(): void {
@@ -539,6 +549,10 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
 
   static get styles(): CSSResult {
     return css`
+    overflow_fix {
+      overflow: hidden; /* needed or else the slider will trigger scroll bar when it leaves hui-view even though it's invisible */
+    }
+
     ha-card {
       box-sizing: border-box;
       height: 100%;
@@ -547,8 +561,6 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
       flex-direction: column;
       justify-content: space-between;
       touch-action: pan-y;
-      background: var(--ha-card-border-color,var(--divider-color,#e0e0e0));;
-      /* overflow: hidden;         still needed or else the slider will trigger scroll bar when it leaves hui-view even though it's invisible */
       line-height: 0;
     }
     ha-card.square {
@@ -588,7 +600,7 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
       height: 100%;
       width: 100%;
       display: block;
-      border-radius: calc(var(--ha-card-border-radius) - var(--ha-card-border-width, 1px));
+      border-radius: calc(var(--ha-card-border-radius, 12px) - var(--ha-card-border-width, 1px));
       mask-image: radial-gradient(white, black);
       transition: all 0.2s ease-in-out;
       touch-action: pan-y;
@@ -733,14 +745,14 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
       height: 100%;
       width: 100%;
       background-color: var( --ha-card-background, var(--card-background-color, var(--btn-bg-color-on, black)) );
-      cursor: ew-resize;
+      /* cursor: ew-resize; */
       z-index: 0;
     }
     .slider[data-mode="bottom-top"] {
-      cursor: ns-resize;     
+      /* cursor: ns-resize; */  
     }
     .slider[data-mode="top-bottom"] {
-      cursor: ns-resize;
+      /* cursor: ns-resize; */
     }
     .slider:active {
       cursor: grabbing;

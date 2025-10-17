@@ -5,6 +5,18 @@ import { fireEvent } from 'custom-card-helpers';
 
 const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
 
+const MAX_CLICK_TIME = 250;
+const HOLD_TIME = 500;
+const MAX_HOLD_DISTANCE = 10;
+const MIN_DRAG_DISTANCE = 15;
+const DOUBLE_CLICK_DELAY = 250;
+
+let startX = 0;
+let startY = 0;
+let startTime = 0;
+let moved = false;
+let dragStarted = false;
+
 interface ActionHandler extends HTMLElement {
   holdTime: number;
   bind(element: Element, options): void;
@@ -81,43 +93,77 @@ class ActionHandler extends HTMLElement implements ActionHandler {
       return false;
     });
 
-    const start = (ev: Event): void => {
+    const start = (ev: PointerEvent | TouchEvent): void => {
       this.held = false;
-      let x;
-      let y;
-      if ((ev as TouchEvent).touches) {
-        x = (ev as TouchEvent).touches[0].pageX;
-        y = (ev as TouchEvent).touches[0].pageY;
-      } else {
-        x = (ev as MouseEvent).pageX;
-        y = (ev as MouseEvent).pageY;
-      }
+      dragStarted = false;
+      moved = false;
 
+      if ((ev as TouchEvent).touches) {
+        startX = (ev as TouchEvent).touches[0].pageX;
+        startY = (ev as TouchEvent).touches[0].pageY;
+      } else {
+        startX = (ev as MouseEvent).pageX;
+        startY = (ev as MouseEvent).pageY;
+      }
+      startTime = Date.now();
+
+      // Start hold timer
       if (options.hasHold) {
         this.timer = window.setTimeout(() => {
-          this.startAnimation(x, y);
-          this.held = true;
-          fireEvent(element, 'action', { action: 'hold' });
-        }, this.holdTime);
+          if (!moved) {
+            this.startAnimation(startX, startY);
+            this.held = true;
+            fireEvent(element, 'action', { action: 'hold' });
+          }
+        }, HOLD_TIME);
       }
     };
 
-    const end = (ev: Event): void => {
-      // Prevent mouse event if touch event
-      ev.preventDefault();
-      if (['touchend', 'touchcancel'].includes(ev.type) && this.timer === undefined) {
-        return;
+    const move = (ev: PointerEvent | TouchEvent): void => {
+      let currentX, currentY;
+      if ((ev as TouchEvent).touches) {
+        currentX = (ev as TouchEvent).touches[0].pageX;
+        currentY = (ev as TouchEvent).touches[0].pageY;
+      } else {
+        currentX = (ev as MouseEvent).pageX;
+        currentY = (ev as MouseEvent).pageY;
       }
+      const distance = Math.hypot(currentX - startX, currentY - startY);
+      if (distance > MAX_HOLD_DISTANCE) {
+        moved = true;
+        clearTimeout(this.timer);
+      }
+      if (distance > MIN_DRAG_DISTANCE && !dragStarted) {
+        dragStarted = true;
+        element.style.cursor = 'grabbing';
+      }
+    };
+
+    const end = (ev: PointerEvent | TouchEvent): void => {
+      console.debug('Pointer ended', ev.type);
       clearTimeout(this.timer);
       this.stopAnimation();
-      this.timer = undefined;
-      if (this.held) {return}
+
+      const duration = Date.now() - startTime;
+      element.style.cursor = 'pointer';
+
+      if (dragStarted || moved) {
+        // treat as drag end, no click
+        return;
+      }
+
+      if (this.held) return; // hold already fired
+
+      const validClick = duration < MAX_CLICK_TIME;
+      if (!validClick) return;
+
+      // handle double click
       if (options.hasDoubleClick) {
-        if ((ev.type === 'click' && (ev as MouseEvent).detail < 2) || !this.dblClickTimeout) {
+        if (!this.dblClickTimeout) {
           this.dblClickTimeout = window.setTimeout(() => {
             this.dblClickTimeout = undefined;
             fireEvent(element, 'action', { action: 'tap' });
-          }, 250);
+          }, DOUBLE_CLICK_DELAY);
         } else {
           clearTimeout(this.dblClickTimeout);
           this.dblClickTimeout = undefined;
@@ -128,21 +174,10 @@ class ActionHandler extends HTMLElement implements ActionHandler {
       }
     };
 
-    const handleEnter = (ev: KeyboardEvent): void => {
-      if (ev.keyCode !== 13) {
-        return;
-      }
-      end(ev);
-    };
-
-    element.addEventListener('touchstart', start, { passive: true });
-    element.addEventListener('touchend', end);
-    element.addEventListener('touchcancel', end);
-
-    element.addEventListener('mousedown', start, { passive: true });
-    element.addEventListener('click', end);
-
-    element.addEventListener('keyup', handleEnter);
+    element.addEventListener('pointerdown', start);
+    element.addEventListener('pointermove', move);
+    element.addEventListener('pointerup', end);
+    element.addEventListener('pointercancel', end);
   }
 
   private startAnimation(x: number, y: number): void {
