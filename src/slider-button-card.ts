@@ -1,21 +1,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/camelcase */
-import { ActionHandlerEvent, applyThemesOnElement, computeStateDomain, handleAction, hasConfigOrEntityChanged, HomeAssistant, LovelaceCard, LovelaceCardEditor, STATES_OFF} from 'custom-card-helpers';
+import { ActionHandlerEvent, applyThemesOnElement, handleAction, hasConfigOrEntityChanged, HomeAssistant, LovelaceCard, LovelaceCardEditor } from 'custom-card-helpers';
 import copy from 'fast-copy';
 import { customElement, eventOptions, html, LitElement, property, PropertyValues, query, state, TemplateResult, CSSResult, CSSResultArray } from 'lit-element';
-import { classMap } from 'lit-html/directives/class-map';
-import { ifDefined } from 'lit-html/directives/if-defined';
-import { styleMap } from 'lit-html/directives/style-map';
-import { actionHandler } from './action-handler-directive';
 import { CARD_VERSION } from './const';
 import { Controller } from './controllers/controller';
 import { ControllerFactory } from './controllers/get-controller';
 import './editor';
 import { localize, setLanguage } from './localize/localize';
 import type { SliderButtonCardConfig } from './types';
-import { ActionButtonConfigDefault, ActionButtonMode, IconConfigDefault, SliderDirection } from './types';
+import { ActionButtonConfigDefault, IconConfigDefault, SliderDirection } from './types';
 import { getSliderDefaultForEntity, normalize } from './utils';
-import { sliderButtonCardStyles } from './slider-button-card-styles';
+import { sliderButtonCardStyles } from './slider-button-card-css';
+import { renderSliderButtonCard } from './slider-button-card-html';
 
 // This prints card name and verison to console
 console.info(
@@ -138,186 +135,7 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
     if (!this.ctrl.stateObj) {
       return this._showError(localize('common.show_error'));
     }
-    return html`
-      <overflow_fix>
-        <ha-card
-          tabindex="0"
-          .label=${`SliderButton: ${this.config.entity || 'No Entity Defined'}`}
-          class="${classMap({ 'square': this.config.slider?.force_square || false, 'hide-name': !this.config.show_name, 'hide-state': !this.config.show_state, 'hide-action': !this.config.action_button?.show , 'compact': this.config.compact === true })}"
-          data-mode="${this.config.slider?.direction}"
-        >
-          <div class="button
-            ${classMap({ off: this.ctrl.isOff, unavailable: this.ctrl.isUnavailable })}"
-            data-mode="${this.config.slider?.direction}"
-            style=${styleMap({
-              '--slider-value': `${this.ctrl.percentage}%`,
-              '--slider-bg-filter': this.ctrl.style.slider.filter,
-              '--slider-color': this.ctrl.style.slider.color,
-              '--icon-filter': this.ctrl.style.icon.filter,
-              '--icon-color': this.ctrl.style.icon.color,
-            })}
-          >
-            <div class="slider"
-              @action=${ (e): void => this._sliderAction(e, this.config.slider)}
-                .actionHandler=${actionHandler({
-                  hasHold: true,
-                  hasDoubleClick: !!this.config.slider?.double_tap_action && this.config.slider.double_tap_action.action !== 'none'
-                })}
-              data-show-track="${this.config.slider?.show_track}"
-              data-mode="${this.config.slider?.direction}"
-              data-background="${this.config.slider?.background}"
-              data-disable-sliding="${this.ctrl.disableSliding}"
-              @pointerdown=${this.onPointerDown}
-              @pointermove=${this.onPointerMove}
-              @pointerup=${this.onPointerUp}
-              @pointercancel=${this.onPointerCancel}
-            >
-              ${this.ctrl.disableSliding
-                ? html`<div class="toggle-overlay"></div>`
-                : ''}
-              <div class="slider-bg"></div>
-              <div class="slider-thumb"></div>           
-            </div>
-            ${this.renderScrollHelper()}
-            ${this.renderAction()}
-            ${this.renderIcon()}
-            ${this.renderText()}
-          </div>
-        </ha-card>
-      </overflow_fix>
-    `;
-  }
-
-  private renderScrollHelper(): TemplateResult {
-    const isVertical = this.config.slider?.direction === SliderDirection.TOP_BOTTOM
-      || this.config.slider?.direction === SliderDirection.BOTTOM_TOP;
-    
-    if (isVertical)
-      return html`<div class="mobile-vertical-scroll-helper"></div>`
-    else
-      return html``
-  }
-
-  private renderIcon(): TemplateResult {
-    if (this.config.icon?.show === false) {
-      return html``;
-    }
-    let hasPicture = false;
-    let backgroundImage = '';
-    if (this.ctrl.stateObj.attributes.entity_picture) {
-      backgroundImage = `url(${this.ctrl.stateObj.attributes.entity_picture})`;
-      hasPicture = true;
-    }
-
-    // Check if all actions are undefined or 'none'
-    const iconConfig = this.config.icon || {};
-    const noAction = (
-      (!iconConfig.tap_action || iconConfig.tap_action.action === 'none') &&
-      (!iconConfig.hold_action || iconConfig.hold_action.action === 'none') &&
-      (!iconConfig.double_tap_action || iconConfig.double_tap_action.action === 'none')
-    );
-
-    return html`
-      <div class="icon ${classMap({ 'has-picture': hasPicture, 'no-action': noAction })}"
-           @action=${ (e): void => this._handleAction(e, this.config.icon)}
-           .actionHandler=${actionHandler({
-             hasHold: false,
-             hasDoubleClick: false,
-           })}
-           style=${styleMap({
-             'background-image': `${backgroundImage}`,
-           })}
-           >
-        <icon-background></icon-background>
-        <ha-icon
-          tabindex="-1"
-          data-domain=${computeStateDomain(this.ctrl.stateObj)}
-          data-state=${ifDefined(
-            this.ctrl.stateObj ? this.ctrl.state : undefined
-          )}          
-          .icon=${this.ctrl.icon}
-        />
-      </div>
-    `;
-  }
-
-  private renderText(): TemplateResult {
-    if (!this.config.show_name && !this.config.show_state && !this.config.show_attribute) {
-      return html``;
-    }
-    return html`
-          <div class="text">
-            ${this.config.show_name
-              ? html`
-                <div class="name">${this.ctrl.name}</div>
-                `
-              : ''}
-
-              <span class="oneliner">
-              ${this.config.show_state
-                ? html`
-                  <span class="state">
-                    ${this.ctrl.isUnavailable
-                    ? html`
-                      ${this.hass.localize('state.default.unavailable')}
-                      ` : html`
-                      ${this.ctrl.label}
-                    `}
-                  </span>
-                  `
-                  : ''}
-
-              ${this.config.show_attribute
-                ? html`
-                  <span class="attribute">
-                  ${this.config.show_state && this.ctrl.attributeLabel
-                    ? html `  ·  `
-                    : ''}
-                ${this.ctrl.attributeLabel}
-                  </span>
-                `
-                : ''}
-              </span>
-          </div>
-    `;
-  }
-
-  private renderAction(): TemplateResult {
-    if (this.config.action_button?.show === false) {
-      return html``;
-    }
-    if (this.config.action_button?.mode === ActionButtonMode.TOGGLE) {
-      return html`
-        <div class="action">
-          <ha-switch
-            .disabled=${this.ctrl.isUnavailable}
-            .checked=${!STATES_OFF.includes(this.ctrl.state)}
-            @change=${this._toggle}
-          ></ha-switch>
-        </div>
-      `;
-    }
-    return html`
-      <div class="action"
-           @action=${ (e): void => this._handleAction(e, this.config.action_button)}
-           .actionHandler=${actionHandler({
-             hasHold: false,
-             hasDoubleClick: false,
-           })}           
-           >
-        <ha-icon
-          tabindex="-1"
-          .icon=${this.config.action_button?.icon || 'mdi:power'}
-        ></ha-icon>
-        ${typeof this.config.action_button?.show_spinner === 'undefined' || this.config.action_button?.show_spinner 
-          ? html`
-            <svg class="circular-loader" viewBox="25 25 50 50">
-              <circle class="loader-path" cx="50" cy="50" r="20"></circle>
-            </svg>
-                `
-          : ''}
-      </div>
-    `;
+    return renderSliderButtonCard(this);
   }
 
   private _handleAction(ev: ActionHandlerEvent, config): void {

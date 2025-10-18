@@ -1,0 +1,208 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { html, TemplateResult } from 'lit-element';
+import { classMap } from 'lit-html/directives/class-map';
+import { styleMap } from 'lit-html/directives/style-map';
+import { ifDefined } from 'lit-html/directives/if-defined';
+import { actionHandler } from './action-handler-directive';
+import { SliderDirection, ActionButtonMode } from './types';
+import { STATES_OFF, computeStateDomain } from 'custom-card-helpers';
+
+
+
+function renderScrollHelper(self: any): TemplateResult {
+  const isVertical =
+    self.config.slider?.direction === SliderDirection.TOP_BOTTOM ||
+    self.config.slider?.direction === SliderDirection.BOTTOM_TOP;
+
+  return isVertical
+    ? html`<div class="mobile-vertical-scroll-helper"></div>`
+    : html``;
+}
+
+
+
+function renderIcon(self: any): TemplateResult {
+  const { config, ctrl } = self;
+
+  if (config.icon?.show === false) return html``;
+
+  let hasPicture = false;
+  let backgroundImage = '';
+  if (ctrl.stateObj.attributes.entity_picture) {
+    backgroundImage = `url(${ctrl.stateObj.attributes.entity_picture})`;
+    hasPicture = true;
+  }
+
+  const iconConfig = config.icon || {};
+  const noAction =
+    (!iconConfig.tap_action || iconConfig.tap_action.action === 'none') &&
+    (!iconConfig.hold_action || iconConfig.hold_action.action === 'none') &&
+    (!iconConfig.double_tap_action ||
+      iconConfig.double_tap_action.action === 'none');
+
+  return html`
+    <div
+      class="icon ${classMap({
+        'has-picture': hasPicture,
+        'no-action': noAction,
+      })}"
+      @action=${(e: Event): void => self._handleAction(e, config.icon)}
+      .actionHandler=${actionHandler({
+        hasHold: false,
+        hasDoubleClick: false,
+      })}
+      style=${styleMap({
+        'background-image': `${backgroundImage}`,
+      })}
+    >
+      <icon-background></icon-background>
+      <ha-icon
+        tabindex="-1"
+        data-domain=${computeStateDomain(ctrl.stateObj)}
+        data-state=${ifDefined(ctrl.stateObj ? ctrl.state : undefined)}
+        .icon=${ctrl.icon}
+      ></ha-icon>
+    </div>
+  `;
+}
+
+
+
+function renderText(self: any): TemplateResult {
+  const { config, ctrl, hass } = self;
+  if (!config.show_name && !config.show_state && !config.show_attribute)
+    return html``;
+
+  return html`
+    <div class="text">
+      ${config.show_name ? html`<div class="name">${ctrl.name}</div>` : ''}
+      <span class="oneliner">
+        ${config.show_state
+          ? html`
+              <span class="state">
+                ${ctrl.isUnavailable
+                  ? html`${hass.localize('state.default.unavailable')}`
+                  : html`${ctrl.label}`}
+              </span>
+            `
+          : ''}
+        ${config.show_attribute
+          ? html`
+              <span class="attribute">
+                ${config.show_state && ctrl.attributeLabel
+                  ? html` · `
+                  : ''}
+                ${ctrl.attributeLabel}
+              </span>
+            `
+          : ''}
+      </span>
+    </div>
+  `;
+}
+
+
+
+function renderAction(self: any): TemplateResult {
+  const { config, ctrl } = self;
+
+  if (config.action_button?.show === false) return html``;
+
+  if (config.action_button?.mode === ActionButtonMode.TOGGLE) {
+    return html`
+      <div class="action">
+        <ha-switch
+          .disabled=${ctrl.isUnavailable}
+          .checked=${!STATES_OFF.includes(ctrl.state)}
+          @change=${self._toggle}
+        ></ha-switch>
+      </div>
+    `;
+  }
+
+  return html`
+    <div
+      class="action"
+      @action=${(e: Event): void =>
+        self._handleAction(e, config.action_button)}
+      .actionHandler=${actionHandler({
+        hasHold: false,
+        hasDoubleClick: false,
+      })}
+    >
+      <ha-icon
+        tabindex="-1"
+        .icon=${config.action_button?.icon || 'mdi:power'}
+      ></ha-icon>
+      ${typeof config.action_button?.show_spinner === 'undefined' ||
+      config.action_button?.show_spinner
+        ? html`
+            <svg class="circular-loader" viewBox="25 25 50 50">
+              <circle class="loader-path" cx="50" cy="50" r="20"></circle>
+            </svg>
+          `
+        : ''}
+    </div>
+  `;
+}
+
+
+
+export function renderSliderButtonCard(self: any): TemplateResult {
+  const { config, ctrl } = self;
+
+  return html`
+    <overflow_fix>
+      <ha-card
+        tabindex="0"
+        .label=${`SliderButton: ${config.entity || 'No Entity Defined'}`}
+        class="${classMap({
+          square: config.slider?.force_square || false,
+          'hide-name': !config.show_name,
+          'hide-state': !config.show_state,
+          'hide-action': !config.action_button?.show,
+          compact: config.compact === true,
+        })}"
+        data-mode="${config.slider?.direction}"
+      >
+        <div class="button 
+          ${classMap({ off: ctrl.isOff, unavailable: ctrl.isUnavailable, })}"
+          data-mode="${config.slider?.direction}"
+          style=${styleMap({
+            '--slider-value': `${ctrl.percentage}%`,
+            '--slider-bg-filter': ctrl.style.slider.filter,
+            '--slider-color': ctrl.style.slider.color,
+            '--icon-filter': ctrl.style.icon.filter,
+            '--icon-color': ctrl.style.icon.color,
+          })}
+        >
+          <div class="slider"
+            @action=${(e: Event): void => self._sliderAction(e, config.slider)}
+            .actionHandler=${actionHandler({
+              hasHold: true,
+              hasDoubleClick:
+                !!config.slider?.double_tap_action &&
+                config.slider.double_tap_action.action !== 'none',
+            })}
+            data-show-track="${config.slider?.show_track}"
+            data-mode="${config.slider?.direction}"
+            data-background="${config.slider?.background}"
+            data-disable-sliding="${ctrl.disableSliding}"
+            @pointerdown=${self.onPointerDown}
+            @pointermove=${self.onPointerMove}
+            @pointerup=${self.onPointerUp}
+            @pointercancel=${self.onPointerCancel}
+          >
+            ${ctrl.disableSliding ? html`<div class="toggle-overlay"></div>` : ''}
+            <div class="slider-bg"></div>
+            <div class="slider-thumb"></div>
+          </div>
+          ${renderScrollHelper(self)}
+          ${renderAction(self)}
+          ${renderIcon(self)}
+          ${renderText(self)}
+        </div>
+      </ha-card>
+    </overflow_fix>
+  `;
+}
