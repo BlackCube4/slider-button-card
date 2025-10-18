@@ -1,5 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { directive, PropertyPart } from 'lit-html';
-
 import { ActionHandlerDetail, ActionHandlerOptions } from 'custom-card-helpers/dist/types';
 import { fireEvent } from 'custom-card-helpers';
 
@@ -32,59 +32,15 @@ declare global {
 class ActionHandler extends HTMLElement implements ActionHandler {
   public holdTime = 500;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-
-  protected timer?: number;
-
-  protected held = false;
-
+  private timer?: number;
+  private held = false;
   private dblClickTimeout?: number;
-
-  constructor() {
-    super();
-  }
-
-  public connectedCallback(): void {
-    Object.assign(this.style, {
-      position: 'absolute',
-      width: '50px',
-      height: '50px',
-      transform: 'translate(-50%, -50%)',
-      pointerEvents: 'none',
-      zIndex: '999',
-    });
-
-    ['touchcancel', 'mouseout', 'mouseup', 'touchmove', 'mousewheel', 'wheel', 'scroll'].forEach(ev => {
-      document.addEventListener(
-        ev,
-        () => {
-          clearTimeout(this.timer);
-          this.stopAnimation();
-          this.timer = undefined;
-        },
-        { passive: true },
-      );
-    });
-  }
 
   public bind(element: ActionHandlerElement, options): void {
     if (element.actionHandler) {
       return;
     }
     element.actionHandler = true;
-
-    element.addEventListener('contextmenu', (ev: Event) => {
-      const e = ev || window.event;
-      if (e.preventDefault) {
-        e.preventDefault();
-      }
-      if (e.stopPropagation) {
-        e.stopPropagation();
-      }
-      e.cancelBubble = true;
-      e.returnValue = false;
-      return false;
-    });
 
     const start = (ev: PointerEvent | TouchEvent): void => {
       this.held = false;
@@ -104,7 +60,6 @@ class ActionHandler extends HTMLElement implements ActionHandler {
       if (options.hasHold) {
         this.timer = window.setTimeout(() => {
           if (!moved) {
-            this.startAnimation(startX, startY);
             this.held = true;
             fireEvent(element, 'action', { action: 'hold' });
           }
@@ -132,10 +87,8 @@ class ActionHandler extends HTMLElement implements ActionHandler {
       }
     };
 
-    const end = (ev: PointerEvent | TouchEvent): void => {
-      console.debug('Pointer ended', ev.type);
+    const end = (_ev: PointerEvent | TouchEvent): void => {
       clearTimeout(this.timer);
-      this.stopAnimation();
 
       const duration = Date.now() - startTime;
       element.style.cursor = 'pointer';
@@ -172,21 +125,8 @@ class ActionHandler extends HTMLElement implements ActionHandler {
     element.addEventListener('pointerup', end);
     element.addEventListener('pointercancel', end);
   }
-
-  private startAnimation(x: number, y: number): void {
-    Object.assign(this.style, {
-      left: `${x}px`,
-      top: `${y}px`,
-      display: null,
-    });
-  }
-
-  private stopAnimation(): void {
-    this.style.display = 'none';
-  }
 }
 
-// TODO You need to replace all instances of "action-handler-boilerplate" with "action-handler-<your card name>"
 customElements.define('action-handler-slider-button', ActionHandler);
 
 const getActionHandler = (): ActionHandler => {
