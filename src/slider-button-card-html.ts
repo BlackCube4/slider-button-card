@@ -3,7 +3,6 @@ import { html, TemplateResult } from 'lit-element';
 import { classMap } from 'lit-html/directives/class-map';
 import { styleMap } from 'lit-html/directives/style-map';
 import { ifDefined } from 'lit-html/directives/if-defined';
-import { actionHandler } from './action-handler-directive';
 import { SliderDirection, ActionButtonMode } from './types';
 import { STATES_OFF, computeStateDomain } from 'custom-card-helpers';
 
@@ -47,10 +46,6 @@ function renderIcon(self: any): TemplateResult {
         'no-action': noAction,
       })}"
       @action=${(e: Event): void => self._handleAction(e, config.icon)}
-      .actionHandler=${actionHandler({
-        hasHold: false,
-        hasDoubleClick: false,
-      })}
       style=${styleMap({
         'background-image': `${backgroundImage}`,
       })}
@@ -125,9 +120,6 @@ function renderAction(self: any): TemplateResult {
       class="action"
       @action=${(e: Event): void =>
         self._handleAction(e, config.action_button)}
-      .actionHandler=${actionHandler({
-        hasHold: false,
-        hasDoubleClick: false,
       })}
     >
       <ha-icon
@@ -178,12 +170,6 @@ export function renderSliderButtonCard(self: any): TemplateResult {
         >
           <div class="slider"
             @action=${(e: Event): void => self._sliderAction(e, config.slider)}
-            .actionHandler=${actionHandler({
-              hasHold: true,
-              hasDoubleClick:
-                !!config.slider?.double_tap_action &&
-                config.slider.double_tap_action.action !== 'none',
-            })}
             data-show-track="${config.slider?.show_track}"
             data-mode="${config.slider?.direction}"
             data-background="${config.slider?.background}"

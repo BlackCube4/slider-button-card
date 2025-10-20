@@ -40,13 +40,18 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
   @query('.action') action;
   @query('.slider') slider;
   private ctrl!: Controller;
-  private actionTimeout;
-  private hasSlid = false;
 
-  private readonly DEADZONE_THRESHOLD = 15; // pixels
+  private readonly MAX_CLICK_TIME = 150;
+  private readonly HOLD_TIME = 500;
+  private readonly DOUBLE_CLICK_DELAY = 250;
+  private readonly MAX_CLICK_DISTANCE = 5;
+
   private startX = 0;
   private startY = 0;
+  private lastTapTime = 0;
+  private everLeftMaxDist = false;
 
+  private holdTimer: number | null = null;
   private lastPointerId: number | null = null;
 
   public static async getConfigElement(): Promise<LovelaceCardEditor> {
@@ -111,7 +116,6 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
 
   protected updated(changedProps: PropertyValues): void {
     this.updateValue(this.ctrl.value, false);
-    this.animateActionEnd();
     const oldHass = changedProps.get('hass') as HomeAssistant | undefined;
     const oldConfig = changedProps.get('config') as
       | SliderButtonCardConfig
@@ -140,15 +144,12 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
 
   private _handleAction(ev: ActionHandlerEvent, config): void {
     if (this.hass && this.config && ev.detail.action) {
-      if (config.tap_action?.action === 'toggle' && !this.ctrl.isUnavailable) {
-        this.animateActionStart();
-      }
       handleAction(this, this.hass, {...config, entity: this.config.entity}, ev.detail.action);
     }
   }
 
   private _sliderAction(ev: ActionHandlerEvent, config): void {
-    if (this.hasSlid){return;}
+    if (this.everLeftMaxDist){return;}
     if (this.hass && this.config && ev.detail.action) {
       let actionConfig;
       switch(ev.detail.action) {
@@ -168,16 +169,7 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
           actionConfig = config.tap_action;
       }
   
-      if (actionConfig?.action === 'toggle' && !this.ctrl.isUnavailable) {
-        this.animateActionStart();
-      }
       handleAction(this, this.hass, {...config, entity: this.config.entity}, ev.detail.action);
-    }
-  }
-
-  private _toggle(): void {
-    if (this.hass && this.config) {
-      handleAction(this, this.hass, {tap_action: {action: 'toggle'}, entity: this.config.entity}, 'tap');
     }
   }
 
@@ -185,22 +177,6 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
     this.ctrl.log('setStateValue', value);
     this.updateValue(value, false);
     this.ctrl.value = value;
-  }
-
-  private animateActionStart(): void {
-    this.animateActionEnd();
-    if (this.action) {
-      this.action.classList.add('loading');
-    }
-  }
-
-  private animateActionEnd(): void {
-    if (this.action) {
-      clearTimeout(this.actionTimeout);
-      this.actionTimeout = setTimeout(()=> {
-        this.action.classList.remove('loading');
-      }, 750)
-    }
   }
 
   private updateValue(value: number, changing = true): void {
@@ -247,18 +223,28 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
     `;
   }
 
-  @eventOptions({passive: true})
+
+  /*################################
+  #                                #
+  #         onPointerDown          #
+  #                                #
+  ################################*/
   private onPointerDown(event: PointerEvent): void {
     if (this.config.slider?.direction === SliderDirection.TOP_BOTTOM
-      || this.config.slider?.direction === SliderDirection.BOTTOM_TOP) {
-        event.preventDefault();
-      }
-    event.stopPropagation();
-    if (this.ctrl.isSliderDisabled) {
-      return;
+    || this.config.slider?.direction === SliderDirection.BOTTOM_TOP) {
+      event.preventDefault();
     }
+
+    // event.stopPropagation();
+
     this.lastPointerId = event.pointerId;
     this.slider.setPointerCapture(event.pointerId);
+
+    this.holdTimer = window.setTimeout(() => {
+      if (!this.everLeftMaxDist) {
+        this._sliderAction({ detail: { action: 'hold' } } as any, this.config.slider);
+      }
+    }, this.HOLD_TIME);
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     let oldPercentage;
@@ -270,40 +256,29 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
     // eslint-disable-next-line prefer-const
     oldPercentage = this.ctrl.originalValue;
 
-    this.hasSlid = false;
+    this.everLeftMaxDist = false;
     this.startX = event.clientX;
     this.startY = event.clientY;
   }
 
+
+  /*################################
+  #                                #
+  #         onPointerMove          #
+  #                                #
+  ################################*/
   @eventOptions({passive: true})
-  private onPointerUp(event: PointerEvent): void {
-    if (this.ctrl.isSliderDisabled) {
+  private onPointerMove(event: any): void {
+    if (this.ctrl.isSliderDisabled || !this.slider.hasPointerCapture(event.pointerId)) {
       return;
     }
 
-    this.hasSlid = false;
-    this.setStateValue(this.ctrl.targetValue);
-    this.slider.releasePointerCapture(event.pointerId);
-    this.ctrl.originalValueLock = false;
-    this.ctrl.clickPositionLock = false;
-  }
-
-  private onPointerCancel(event: PointerEvent): void {
-    if (this.config.slider?.direction === SliderDirection.TOP_BOTTOM
-      || this.config.slider?.direction === SliderDirection.BOTTOM_TOP) {
-        return;
-      }
-    this.hasSlid = false;
-    this.updateValue(this.ctrl.value, false);
-    this.slider.releasePointerCapture(event.pointerId);
-    this.ctrl.originalValueLock = false;
-    this.ctrl.clickPositionLock = false;
-  }
-
-  @eventOptions({passive: true})
-  private onPointerMove(event: any): void {
-    if (this.ctrl.isSliderDisabled  || !this.slider.hasPointerCapture(event.pointerId)) {
-      return;
+    const dx = event.clientX - this.startX;
+    const dy = event.clientY - this.startY;
+    const distance = Math.hypot(dx, dy);
+    if (distance > this.MAX_CLICK_DISTANCE && this.holdTimer) {
+      clearTimeout(this.holdTimer);
+      this.holdTimer = null;
     }
 
     const isVertical = this.config.slider?.direction === SliderDirection.TOP_BOTTOM
@@ -313,11 +288,11 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
       isVertical ? event.clientY - this.startY : event.clientX - this.startX
     );
 
-    if (!this.hasSlid && (deltaPixel > this.DEADZONE_THRESHOLD)) {
-      this.hasSlid = true;
+    if (!this.everLeftMaxDist && (deltaPixel > this.MAX_CLICK_DISTANCE)) {
+      this.everLeftMaxDist = true;
     }
     
-    if (this.hasSlid) {
+    if (this.everLeftMaxDist) {
       const {left, top, width, height} = this.slider.getBoundingClientRect();
       this.ctrl.log('event', event);
 
@@ -346,6 +321,73 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
 
       this.updateValue(newPercentage);
     }
+  }
+
+
+  /*################################
+  #                                #
+  #          onPointerUp           #
+  #                                #
+  ################################*/
+  @eventOptions({passive: true})
+  private onPointerUp(event: PointerEvent): void {
+    this.setStateValue(this.ctrl.targetValue);
+    this.slider.releasePointerCapture(event.pointerId);
+    this.ctrl.originalValueLock = false;
+    this.ctrl.clickPositionLock = false;
+
+    if (this.ctrl.isSliderDisabled) return;
+
+    if (this.holdTimer) {
+      clearTimeout(this.holdTimer);
+      this.holdTimer = null;
+    }
+
+    if (this.everLeftMaxDist) {
+      this.everLeftMaxDist = false;
+      return;
+    }
+    this.everLeftMaxDist = false;
+    
+    // --- handle click & double clicks ---
+    const now = Date.now();
+    const hasDoubleTapAction = !!this.config.slider?.double_tap_action && this.config.slider.double_tap_action.action !== 'none';
+
+    if (hasDoubleTapAction) {
+      // Wait to see if a second click occurs within the delay
+      if (now - this.lastTapTime < this.DOUBLE_CLICK_DELAY) {
+        this._sliderAction({ detail: { action: 'double_tap' } } as any, this.config.slider);
+        this.lastTapTime = 0;
+      } else {
+        this.lastTapTime = now;
+
+        // Trigger click only after delay expires (in case of double tap)
+        window.setTimeout(() => {
+          if (Date.now() - this.lastTapTime >= this.DOUBLE_CLICK_DELAY && this.lastTapTime !== 0) {
+            this._sliderAction({ detail: { action: 'tap' } } as any, this.config.slider);
+            this.lastTapTime = 0;
+          }
+        }, this.DOUBLE_CLICK_DELAY);
+      }
+    } else {
+      // No double-tap configured → trigger tap immediately
+      this._sliderAction({ detail: { action: 'tap' } } as any, this.config.slider);
+      this.lastTapTime = now;
+    }
+  }
+
+  
+  /*################################
+  #                                #
+  #        onPointerCancel         #
+  #                                #
+  ################################*/
+  private onPointerCancel(event: PointerEvent): void {
+    this.everLeftMaxDist = false;
+    this.updateValue(this.ctrl.value, false);
+    this.slider.releasePointerCapture(event.pointerId);
+    this.ctrl.originalValueLock = false;
+    this.ctrl.clickPositionLock = false;
   }
 
   connectedCallback(): void {
