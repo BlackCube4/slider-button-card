@@ -10,7 +10,7 @@ import './editor';
 import { localize, setLanguage } from './localize/localize';
 import type { SliderButtonCardConfig } from './types';
 import { ActionButtonConfigDefault, IconConfigDefault, SliderDirection } from './types';
-import { getSliderDefaultForEntity, normalize } from './utils';
+import { getSliderDefaultForEntity, normalize, toRGBAWithAlpha } from './utils';
 import { sliderButtonCardStyles } from './slider-button-card-css';
 import { renderSliderButtonCard } from './slider-button-card-html';
 
@@ -130,10 +130,6 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
     this.ctrl.log('Updated', this.ctrl.value);
   }
 
-  protected firstUpdated(_changedProperties: PropertyValues): void {
-    super.firstUpdated(_changedProperties);
-  }
-
   protected render(): TemplateResult | void {
     this.ctrl.hass = this.hass;
     if (!this.ctrl.stateObj) {
@@ -208,6 +204,9 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
     this.button.style.setProperty('--icon-filter', this.ctrl.style.icon.filter);
     this.button.style.setProperty('--icon-color', this.ctrl.style.icon.color);
     this.button.style.setProperty('--icon-rotate-speed', this.ctrl.style.icon.rotateSpeed || '0s');
+
+    // icon-background opacity:0.2 causes issues on transition so I had to put opacity into the color
+    this.button.style.setProperty('--icon-bg-color', `color-mix(in srgb, ${this.ctrl.style.icon.color} 20%, transparent)`);
   }
 
   private _showError(error: string): TemplateResult {
@@ -388,14 +387,6 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
     this.slider.releasePointerCapture(event.pointerId);
     this.ctrl.originalValueLock = false;
     this.ctrl.clickPositionLock = false;
-  }
-
-  connectedCallback(): void {
-    super.connectedCallback();
-  }
-
-  disconnectedCallback(): void {
-    super.disconnectedCallback();
   }
 
   static get styles(): CSSResult | CSSResultArray {

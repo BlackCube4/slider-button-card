@@ -14,34 +14,21 @@ ha-card {
   touch-action: pan-y;
   line-height: 0;
 }
-ha-card.square {
-  aspect-ratio: 1 / 1;
-}
   
 :host {
   --slider-bg-default-color: var(--primary-color, rgb(95, 124, 171));
   --slider-bg: var(--slider-color);
   --slider-bg-filter: brightness(100%);
   --slider-bg-direction: to right;
-  --slider-track-color: #2b374e; 
-  --slider-tracker-color: transparent;
   --slider-value: 0%;
   --slider-transition-duration: 1s;      
-  /*--label-text-shadow: rgb(255 255 255 / 10%) -1px -1px 1px, rgb(0 0 0 / 50%) 1px 1px 1px;*/
-  /*--label-color-on: var(--primary-text-color, white);*/
-  /*--label-color-off: var(--primary-text-color, white);*/
   --icon-filter: brightness(100%);
   --icon-color: var(--paper-item-icon-color);
   --icon-rotate-speed: 0s;
-  /*--state-color-on: #BAC0C6; */
-  /*--state-color-off: var(--disabled-text-color);*/
-  /*--state-text-shadow: rgb(255 255 255 / 10%) -1px -1px 1px, rgb(0 0 0 / 50%) 1px 1px 1px;*/
   --btn-bg-color-off: rgba(43,55,78,1);
   --btn-bg-color-on: #20293c;
-  /*--action-icon-color-on: var(--paper-item-icon-color, black);*/
-  /*--action-icon-color-off: var(--paper-item-icon-color, black);*/      
-  /*--action-spinner-color: var(--label-badge-text-color, white);*/
 }
+
 /* --- BUTTON --- */
 
 .button {
@@ -84,8 +71,7 @@ ha-card.compact .button {
   -webkit-tap-highlight-color: transparent;
 }
 .icon icon-background {
-  background-color: var(--icon-color);
-  opacity: 0.2;
+  background-color: var(--icon-bg-color);
   width: 100%;
   height: 100%;
   position: absolute;
@@ -112,6 +98,7 @@ ha-card.compact .button {
 .compact .icon {
   float: left;
 }
+
 /* --- TEXT --- */
 
 .text {
@@ -131,7 +118,8 @@ ha-card.compact .button {
   height: 36px;
   left: 0.5rem;
   padding: 0;
-}  
+}
+
 /* --- LABEL --- */
 
 .name {
@@ -153,7 +141,7 @@ ha-card.compact .button {
   line-height: 20px;
   letter-spacing: .1px;
   color: var(--primary-text-color);
-}    
+}
 
 /* --- STATE --- */
 
@@ -350,7 +338,7 @@ ha-card.compact .button {
 .off .slider[data-show-track="true"] .slider-thumb:after {
   opacity: 1;
 }
-              
+
 /* --- ACTION BUTTON --- */      
           
 .action {
@@ -395,14 +383,7 @@ ha-card.compact .button {
   stroke-linecap: round;
 }
 
-/* --- MISC --- */    
-
-.unavailable .slider .toggle-overlay,
-.unavailable .action,
-.unavailable .action ha-switch,    
-.unavailable .slider {
-  cursor: not-allowed !important;
-}
+/* --- MISC --- */
 
 @keyframes rotate {
   100% {
