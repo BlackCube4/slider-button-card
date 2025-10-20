@@ -126,14 +126,6 @@ function renderAction(self: any): TemplateResult {
         tabindex="-1"
         .icon=${config.action_button?.icon || 'mdi:power'}
       ></ha-icon>
-      ${typeof config.action_button?.show_spinner === 'undefined' ||
-      config.action_button?.show_spinner
-        ? html`
-            <svg class="circular-loader" viewBox="25 25 50 50">
-              <circle class="loader-path" cx="50" cy="50" r="20"></circle>
-            </svg>
-          `
-        : ''}
     </div>
   `;
 }

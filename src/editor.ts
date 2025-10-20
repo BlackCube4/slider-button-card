@@ -379,18 +379,6 @@ export class SliderButtonCardEditor extends ScopedRegistryHost(LitElement) imple
                     @change=${this._valueChanged}
                   ></mwc-switch>
                 </mwc-formfield>
-                ${this._action_button.mode === ActionButtonMode.CUSTOM
-                  ? html`
-                    <mwc-formfield .label=${localize('tabs.action_button.show_spinner')}>
-                      <mwc-switch
-                        .checked=${this._action_button.show_spinner}
-                        .configValue=${'action_button.show_spinner'}
-                        @change=${this._valueChanged}
-                      ></mwc-switch>
-                    </mwc-formfield>
-                  `
-                  :
-                  ''}
               </div>
               ${this._action_button.mode === ActionButtonMode.CUSTOM
                 ? html`

@@ -24,7 +24,6 @@ ha-card {
   --slider-transition-duration: 1s;      
   --icon-filter: brightness(100%);
   --icon-color: var(--paper-item-icon-color);
-  --icon-rotate-speed: 0s;
   --btn-bg-color-off: rgba(43,55,78,1);
   --btn-bg-color-on: #20293c;
 }
@@ -364,47 +363,7 @@ ha-card.compact .button {
   color: var(--disabled-text-color);
 }
 
-.circular-loader {
-  position: absolute;
-  width: calc(var(--mdc-icon-size, 24px) + 16px);
-  height: calc(var(--mdc-icon-size, 24px) + 16px);
-  opacity: 0;
-  transition: opacity 0.2s ease-in-out;
-  animation: rotate 2s linear infinite; 
-}   
-.action.loading .circular-loader {
-  opacity: 1;      
-}    
-.loader-path {
-  fill: none;
-  stroke-width: 2px;
-  stroke: var(--action-spinner-color, var(--label-badge-text-color, white));
-  animation: animate-stroke 1.5s ease-in-out infinite both;        
-  stroke-linecap: round;
-}
-
 /* --- MISC --- */
-
-@keyframes rotate {
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
-@keyframes animate-stroke {
-  0% {
-    stroke-dasharray: 1, 200;
-    stroke-dashoffset: 0;
-  }
-  50% {
-    stroke-dasharray: 89, 200;
-    stroke-dashoffset: -35;
-  }
-  100% {
-    stroke-dasharray: 89, 200;
-    stroke-dashoffset: -124;
-  }
-}
 
 .mobile-vertical-scroll-helper {
   position: absolute;
