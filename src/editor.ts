@@ -350,27 +350,6 @@ export class SliderButtonCardEditor extends ScopedRegistryHost(LitElement) imple
             <input type="checkbox" id="action" class="tab-checkbox">
             <label class="tab-label" for="action">${localize('tabs.action_button.title')}</label>
             <div class="tab-content">
-              ${this._renderOptionSelector(
-                `action_button.mode`,
-                this.actionModes.map(mode => {
-                  return {'value': mode, 'label': localize(`mode.${mode}`)}
-                }), localize('tabs.action_button.mode'),
-                this._action_button.mode || ''
-              )}
-              ${this._action_button.mode === ActionButtonMode.CUSTOM 
-              ? html`
-                <ha-icon-picker
-                  .hass=${this.hass}
-                  .value=${this._action_button.icon}
-                  .placeholder=${this._action_button.icon || 'mdi:power'}
-                  .configValue=${"action_button.icon"}
-                  .label=${localize('tabs.action_button.icon')}
-                  @value-changed=${this._valueChanged}
-                >
-                </ha-icon-picker>
-                ` 
-              : 
-                ''}
               <div class="side-by-side">
                 <mwc-formfield .label=${localize('tabs.action_button.show_button')}>
                   <mwc-switch
@@ -379,23 +358,34 @@ export class SliderButtonCardEditor extends ScopedRegistryHost(LitElement) imple
                     @change=${this._valueChanged}
                   ></mwc-switch>
                 </mwc-formfield>
+                <mwc-formfield .label=${localize('tabs.action_button.show_spinner')}>
+                  <mwc-switch
+                    .checked=${this._action_button.show_spinner}
+                    .configValue=${'action_button.show_spinner'}
+                    @change=${this._valueChanged}
+                  ></mwc-switch>
+                </mwc-formfield>
               </div>
-              ${this._action_button.mode === ActionButtonMode.CUSTOM
-                ? html`
-                  <ha-selector
-                    .hass=${this.hass}
-                    .selector=${{
-                      ui_action: {}
-                    }}
-                    .label="${localize('tabs.action_button.tap_action')}"
-                    .value=${this._action_button.tap_action}
-                    .required=${false}
-                    .configValue=${"action_button.tap_action"}
-                    @value-changed=${this._valueChangedSelect}
-                  ></ha-selector>
-                `
-                :
-                ''}
+              <ha-icon-picker
+                .hass=${this.hass}
+                .value=${this._action_button.icon}
+                .placeholder=${this._action_button.icon || 'mdi:power'}
+                .configValue=${"action_button.icon"}
+                .label=${localize('tabs.action_button.icon')}
+                @value-changed=${this._valueChanged}
+              >
+              </ha-icon-picker>
+              <ha-selector
+                .hass=${this.hass}
+                .selector=${{
+                  ui_action: {}
+                }}
+                .label="${localize('tabs.action_button.tap_action')}"
+                .value=${this._action_button.tap_action}
+                .required=${false}
+                .configValue=${"action_button.tap_action"}
+                @value-changed=${this._valueChangedSelect}
+              ></ha-selector>
             </div>
           </div>
         </div>

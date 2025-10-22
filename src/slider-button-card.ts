@@ -128,6 +128,9 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
       applyThemesOnElement(this, this.hass.themes, this.config.theme);
     }
     this.ctrl.log('Updated', this.ctrl.value);
+    if (this.action) this._bindClickActions(this.action, this.config.action_button);
+    if (this.shadowRoot?.querySelector(".icon"))
+      this._bindClickActions(this.shadowRoot.querySelector(".icon") as HTMLElement, this.config.icon);
   }
 
   protected render(): TemplateResult | void {
@@ -138,10 +141,105 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
     return renderSliderButtonCard(this);
   }
 
-  private _handleAction(ev: ActionHandlerEvent, config): void {
-    if (this.hass && this.config && ev.detail.action) {
-      handleAction(this, this.hass, {...config, entity: this.config.entity}, ev.detail.action);
+  private _bindClickActions(element: HTMLElement, config: any): void {
+    let holdTimer: number | null = null;
+    let lastTap = 0;
+    const DOUBLE_TAP_DELAY = 250;
+    const HOLD_TIME = 500;
+
+    element.addEventListener("pointerdown", () => {
+      holdTimer = window.setTimeout(() => {
+        this._handleAction({ detail: { action: "hold" } } as any, config);
+        holdTimer = null;
+      }, HOLD_TIME);
+    });
+
+    element.addEventListener("pointerup", () => {
+      if (holdTimer) {
+        clearTimeout(holdTimer);
+        const now = Date.now();
+        if (now - lastTap < DOUBLE_TAP_DELAY) {
+          this._handleAction({ detail: { action: "double_tap" } } as any, config);
+          lastTap = 0;
+        } else {
+          this._handleAction({ detail: { action: "tap" } } as any, config);
+          lastTap = now;
+        }
+      }
+    });
+  }
+
+  private _executeAction(actionConfig: any): void {
+    if (!this.hass || !actionConfig || actionConfig.action === "none") return;
+
+    const { action } = actionConfig;
+
+    switch (action) {
+      case "toggle": {
+        const entity = actionConfig.entity || this.config.entity;
+        if (entity) {
+          const [domain, name] = entity.split(".");
+          this.hass.callService(domain, "toggle", { entity_id: entity });
+        }
+        break;
+      }
+
+      case "call-service": {
+        const [domain, service] = actionConfig.service.split(".");
+        const data = {
+          ...(actionConfig.service_data || {}),
+          ...(actionConfig.target ? { target: actionConfig.target } : {}),
+        };
+        this.hass.callService(domain, service, data);
+        break;
+      }
+
+      case "perform-action": {
+        const [domain, service] = actionConfig.perform_action.split(".");
+        const data = {
+          ...(actionConfig.data || {}),
+          ...(actionConfig.target ? { ...actionConfig.target } : {}),
+        };
+        this.hass.callService(domain, service, data);
+        break;
+      }
+
+      case "more-info": {
+        const entity = actionConfig.entity || this.config.entity;
+        const event = new CustomEvent("hass-more-info", {
+          composed: true,
+          bubbles: true,
+          detail: { entityId: entity },
+        });
+        this.dispatchEvent(event);
+        break;
+      }
+
+      case "navigate": {
+        if (actionConfig.navigation_path) {
+          history.pushState(null, "", actionConfig.navigation_path);
+          window.dispatchEvent(new Event("location-changed"));
+        }
+        break;
+      }
+
+      case "url": {
+        if (actionConfig.url_path) window.open(actionConfig.url_path, "_blank");
+        break;
+      }
+
+      default:
+        console.warn("Unknown action type:", action);
     }
+  }
+
+  private _handleAction(ev: ActionHandlerEvent, config): void {
+    if (!ev?.detail?.action || !config) return;
+
+    const type = ev.detail.action;
+    const actionConfig = config?.[`${type}_action`] || config;
+
+    this._executeAction(actionConfig);
   }
 
   private _sliderAction(ev: ActionHandlerEvent, config): void {
@@ -150,22 +248,23 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
       let actionConfig;
       switch(ev.detail.action) {
         case 'hold':
-          console.log("hold");
+          //console.log("hold");
           try {
             this.slider.releasePointerCapture?.(this.lastPointerId);
           } catch (e) {}
           actionConfig = config.hold_action;
           break;
         case 'double_tap':
-          console.log("double_tap");
+          //console.log("double_tap");
           actionConfig = config.double_tap_action;
           break;
         default:
-          console.log("default");
+          //console.log("default");
           actionConfig = config.tap_action;
       }
   
-      handleAction(this, this.hass, {...config, entity: this.config.entity}, ev.detail.action);
+      if (!actionConfig || actionConfig.action === "none") return;
+      this._executeAction(actionConfig);
     }
   }
 

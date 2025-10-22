@@ -25,7 +25,6 @@ export interface SliderButtonCardConfig extends LovelaceCardConfig {
 }
 
 export interface ActionButtonConfig {
-  mode?: ActionButtonMode;
   icon?: string;
   show?: boolean;
   show_spinner?: boolean;
@@ -128,7 +127,6 @@ export enum CoverAttributes {
 }
 
 export const ActionButtonConfigDefault: ActionButtonConfig = {
-  mode: ActionButtonMode.TOGGLE,
   icon: 'mdi:power',
   show: false,
   show_spinner: false,

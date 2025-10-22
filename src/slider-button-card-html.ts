@@ -3,9 +3,8 @@ import { html, TemplateResult } from 'lit-element';
 import { classMap } from 'lit-html/directives/class-map';
 import { styleMap } from 'lit-html/directives/style-map';
 import { ifDefined } from 'lit-html/directives/if-defined';
-import { SliderDirection, ActionButtonMode } from './types';
-import { STATES_OFF, computeStateDomain } from 'custom-card-helpers';
-
+import { SliderDirection } from './types';
+import { computeStateDomain } from 'custom-card-helpers';
 
 
 function renderScrollHelper(self: any): TemplateResult {
@@ -17,7 +16,6 @@ function renderScrollHelper(self: any): TemplateResult {
     ? html`<div class="mobile-vertical-scroll-helper"></div>`
     : html``;
 }
-
 
 
 function renderIcon(self: any): TemplateResult {
@@ -45,6 +43,9 @@ function renderIcon(self: any): TemplateResult {
         'has-picture': hasPicture,
         'no-action': noAction,
       })}"
+      .actionHandler=${(window as any).actionHandler
+        ? (window as any).actionHandler({ hasHold: true, hasDoubleClick: true })
+        : undefined}
       @action=${(e: Event): void => self._handleAction(e, config.icon)}
       style=${styleMap({
         'background-image': `${backgroundImage}`,
@@ -103,24 +104,14 @@ function renderAction(self: any): TemplateResult {
 
   if (config.action_button?.show === false) return html``;
 
-  if (config.action_button?.mode === ActionButtonMode.TOGGLE) {
-    return html`
-      <div class="action">
-        <ha-switch
-          .disabled=${ctrl.isUnavailable}
-          .checked=${!STATES_OFF.includes(ctrl.state)}
-          @change=${self._toggle}
-        ></ha-switch>
-      </div>
-    `;
-  }
-
   return html`
     <div
       class="action"
+      .actionHandler=${(window as any).actionHandler
+        ? (window as any).actionHandler({ hasHold: true, hasDoubleClick: true })
+        : undefined}
       @action=${(e: Event): void =>
         self._handleAction(e, config.action_button)}
-      })}
     >
       <ha-icon
         tabindex="-1"
