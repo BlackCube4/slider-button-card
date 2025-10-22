@@ -302,13 +302,6 @@ export class SliderButtonCardEditor extends ScopedRegistryHost(LitElement) imple
                     @change=${this._valueChanged}
                   ></mwc-switch>
                 </mwc-formfield>
-                <mwc-formfield .label=${localize('tabs.slider.force_square')}>
-                  <mwc-switch
-                    .checked=${this._slider.force_square}
-                    .configValue=${'slider.force_square'}
-                    @change=${this._valueChanged}
-                  ></mwc-switch>
-                </mwc-formfield>
               </div>
               <ha-selector
                 .hass=${this.hass}

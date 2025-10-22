@@ -132,7 +132,6 @@ export function renderSliderButtonCard(self: any): TemplateResult {
         tabindex="0"
         .label=${`SliderButton: ${config.entity || 'No Entity Defined'}`}
         class="${classMap({
-          square: config.slider?.force_square || false,
           'hide-name': !config.show_name,
           'hide-state': !config.show_state,
           'hide-action': !config.action_button?.show,
