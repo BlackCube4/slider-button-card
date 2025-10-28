@@ -240,10 +240,32 @@ export class SliderButtonCardEditor extends ScopedRegistryHost(LitElement) imple
                 .selector=${{
                   ui_action: {}
                 }}
-                .label="${localize('tabs.icon.tap_action')}"
+                .label="${localize('tap_action')}"
                 .value=${this._icon.tap_action}
                 .required=${false}
                 .configValue=${"icon.tap_action"}
+                @value-changed=${this._valueChangedSelect}
+              ></ha-selector>
+              <ha-selector
+                .hass=${this.hass}
+                .selector=${{
+                  ui_action: {}
+                }}
+                .label="${localize('hold_action')}"
+                .value=${this._icon.hold_action}
+                .required=${false}
+                .configValue=${"icon.hold_action"}
+                @value-changed=${this._valueChangedSelect}
+              ></ha-selector>
+              <ha-selector
+                .hass=${this.hass}
+                .selector=${{
+                  ui_action: {}
+                }}
+                .label="${localize('double_tap_action')}"
+                .value=${this._icon.double_tap_action}
+                .required=${false}
+                .configValue=${"icon.double_tap_action"}
                 @value-changed=${this._valueChangedSelect}
               ></ha-selector>
             </div>
@@ -373,10 +395,32 @@ export class SliderButtonCardEditor extends ScopedRegistryHost(LitElement) imple
                 .selector=${{
                   ui_action: {}
                 }}
-                .label="${localize('tabs.action_button.tap_action')}"
+                .label="${localize('tap_action')}"
                 .value=${this._action_button.tap_action}
                 .required=${false}
                 .configValue=${"action_button.tap_action"}
+                @value-changed=${this._valueChangedSelect}
+              ></ha-selector>
+              <ha-selector
+                .hass=${this.hass}
+                .selector=${{
+                  ui_action: {}
+                }}
+                .label="${localize('hold_action')}"
+                .value=${this._action_button.hold_action}
+                .required=${false}
+                .configValue=${"action_button.hold_action"}
+                @value-changed=${this._valueChangedSelect}
+              ></ha-selector>
+              <ha-selector
+                .hass=${this.hass}
+                .selector=${{
+                  ui_action: {}
+                }}
+                .label="${localize('double_tap_action')}"
+                .value=${this._action_button.double_tap_action}
+                .required=${false}
+                .configValue=${"action_button.double_tap_action"}
                 @value-changed=${this._valueChangedSelect}
               ></ha-selector>
             </div>

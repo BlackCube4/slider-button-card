@@ -105,7 +105,7 @@ ha-card.compact .button {
   padding-top: inherit;
   pointer-events: none;
   user-select: none;
-  font-size: 1.1rem;
+  font-size: var(--ha-font-size-m);
   line-height: 1.3rem;
   display: flex;
   flex-direction: column;

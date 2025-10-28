@@ -43,10 +43,6 @@ function renderIcon(self: any): TemplateResult {
         'has-picture': hasPicture,
         'no-action': noAction,
       })}"
-      .actionHandler=${(window as any).actionHandler
-        ? (window as any).actionHandler({ hasHold: true, hasDoubleClick: true })
-        : undefined}
-      @action=${(e: Event): void => self._handleAction(e, config.icon)}
       style=${styleMap({
         'background-image': `${backgroundImage}`,
       })}
@@ -68,31 +64,33 @@ function renderText(self: any): TemplateResult {
   const { config, ctrl, hass } = self;
   if (!config.show_name && !config.show_state && !config.show_attribute)
     return html``;
-
+  
   return html`
     <div class="text">
       ${config.show_name ? html`<div class="name">${ctrl.name}</div>` : ''}
-      <span class="oneliner">
-        ${config.show_state
-          ? html`
-              <span class="state">
-                ${ctrl.isUnavailable
-                  ? html`${hass.localize('state.default.unavailable')}`
-                  : html`${ctrl.label}`}
-              </span>
-            `
-          : ''}
-        ${config.show_attribute
-          ? html`
-              <span class="attribute">
-                ${config.show_state && ctrl.attributeLabel
-                  ? html` · `
-                  : ''}
-                ${ctrl.attributeLabel}
-              </span>
-            `
-          : ''}
-      </span>
+      ${config.show_state || config.show_attribute ? html`
+        <span class="oneliner">
+          ${config.show_state
+            ? html`
+                <span class="state">
+                  ${ctrl.isUnavailable
+                    ? html`${hass.localize('state.default.unavailable')}`
+                    : html`${ctrl.label}`}
+                </span>
+              `
+            : ''}
+          ${config.show_attribute
+            ? html`
+                <span class="attribute">
+                  ${config.show_state && ctrl.attributeLabel
+                    ? html` · `
+                    : ''}
+                  ${ctrl.attributeLabel}
+                </span>
+              `
+            : ''}
+        </span>
+      ` : ''}
     </div>
   `;
 }
@@ -105,14 +103,7 @@ function renderAction(self: any): TemplateResult {
   if (config.action_button?.show === false) return html``;
 
   return html`
-    <div
-      class="action"
-      .actionHandler=${(window as any).actionHandler
-        ? (window as any).actionHandler({ hasHold: true, hasDoubleClick: true })
-        : undefined}
-      @action=${(e: Event): void =>
-        self._handleAction(e, config.action_button)}
-    >
+    <div class="action">
       <ha-icon
         tabindex="-1"
         .icon=${config.action_button?.icon || 'mdi:power'}
