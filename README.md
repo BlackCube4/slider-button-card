@@ -53,7 +53,7 @@ Just search for `SliderButtonCard` in Frontend tab.
 
 ### Visual Editor
 
-Slider Button Card supports Lovelace's Visual Editor. 
+SliderButtonCard supports Lovelace's Visual Editor. 
 <details>
   <summary>Show screenshot</summary>
 

@@ -15,7 +15,7 @@ import { getSliderDefaultForEntity, normalize } from './utils';
 
 // This prints card name and verison to console
 console.info(
-  `%c  SLIDER-BUTTON-CARD %c Version 1.13.0 %c`,
+  `%c  SliderButtonCard %c Version 2.0.0 %c`,
   'background-color: #555;color: #fff;padding: 3px 2px 3px 3px;border: 1px solid #555;border-radius: 3px 0 0 3px;font-family: Roboto,Verdana,Geneva,sans-serif;text-shadow: 0 1px 0 rgba(1, 1, 1, 0.3)',
   'background-color: transparent;color: #555;padding: 3px 3px 3px 2px;border: 1px solid #555; border-radius: 0 3px 3px 0;font-family: Roboto,Verdana,Geneva,sans-serif',
   'background-color: transparent'
@@ -25,7 +25,7 @@ console.info(
 (window as any).customCards = (window as any).customCards || [];
 (window as any).customCards.push({
   type: 'slider-button-card',
-  name: 'Slider button Card',
+  name: 'SliderButtonCard',
   description: 'A button card with slider',
   preview: true,
 });
@@ -142,7 +142,7 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
       <overflow_fix>
         <ha-card
           tabindex="0"
-          .label=${`SliderButton: ${config.entity || 'No Entity Defined'}`}
+          .label=${`SliderButtonCard: ${config.entity || 'No Entity Defined'}`}
           class="${classMap({
             'hide-name': !config.show_name,
             'hide-state': !config.show_state,
