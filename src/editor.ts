@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/camelcase */
-import copy from 'fast-copy';
 import { CSSResult, LitElement, TemplateResult, css, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 
@@ -20,25 +19,6 @@ export class SliderButtonCardEditor extends LitElement implements LovelaceCardEd
   private backgrounds = getEnumValues(SliderBackground);
   private actionModes = getEnumValues(ActionButtonMode);
   private colorModes = getEnumValues(ColorMode);
-
-  firstUpdated(): void {
-    this._loadHomeAssistantComponent("ha-entity-picker", { type: "entities", entities: [] });
-    this._loadHomeAssistantComponent("ha-icon-picker", { type: "entities", entities: [] });
-    this._loadHomeAssistantComponent("ha-selector", { type: "entities", entities: [] });
-  }
-
-  async _loadHomeAssistantComponent(component: string, card: {}): Promise<void> {
-    const registry = (this.shadowRoot as any)?.customElements;
-    if (!registry || registry.get(component)) {
-      return;
-    } 
-
-    const ch = await (window as any).loadCardHelpers();
-    const c = await ch.createCardElement(card);
-    await c.constructor.getConfigElement();
-    
-    registry.define(component, window.customElements.get(component));
-  }
 
   public async setConfig(config: SliderButtonCardConfig): Promise<void> {
     this._config = config;
@@ -478,7 +458,7 @@ export class SliderButtonCardEditor extends LitElement implements LovelaceCardEd
     this._changeValue('attribute', '');
     this._changeValue('icon.icon', '');
     if (updateDefaults) {
-      const cfg = copy(this._config);
+      const cfg = structuredClone(this._config);
       applyPatch(cfg, ['slider'], getSliderDefaultForEntity(value));
       this._config = cfg;
       fireEvent(this, 'config-changed', { config: this._config });
@@ -499,7 +479,7 @@ export class SliderButtonCardEditor extends LitElement implements LovelaceCardEd
       return;
     }
     if (configValue) {
-      const cfg = copy(this._config);
+      const cfg = structuredClone(this._config);
       applyPatch(cfg, [...configValue.split('.')], value);
       this._config = cfg;
       if (value === '') {

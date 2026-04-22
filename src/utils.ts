@@ -1,6 +1,4 @@
-import { tinycolor, TinyColor } from '@ctrl/tinycolor';
 import { computeDomain } from './ha-helpers';
-import copy from 'fast-copy';
 import { Domain, SliderConfig, SliderConfigDefault, SliderConfigDefaultDomain } from './types';
 
 export function getEnumValues(enumeration): string[] {
@@ -22,30 +20,25 @@ export const applyPatch = (data, path, value): void => {
 export function getSliderDefaultForEntity(entity: string): SliderConfig {
   const domain = computeDomain(entity) || Domain.LIGHT;
   const cfg = SliderConfigDefaultDomain.get(domain) || SliderConfigDefault;
-  return copy(cfg);
+  return structuredClone(cfg);
 }
 
 export function getLightColorBasedOnTemperature(current: number, min: number, max: number): string {
-  const high = new TinyColor('rgb(255, 160, 0)'); // orange-ish
-  const low = new TinyColor('rgb(166, 209, 255)'); // blue-ish
-  const middle = new TinyColor('white');
   const mixAmount = ((current - min) / (max - min)) * 100;
   if (mixAmount < 50) {
-    return tinycolor(low)
-      .mix(middle, mixAmount * 2)
-      .toRgbString();
+    const pct = Math.round(mixAmount * 2);
+    return `color-mix(in srgb, white ${pct}%, rgb(166, 209, 255))`;
   } else {
-    return tinycolor(middle)
-      .mix(high, (mixAmount - 50) * 2)
-      .toRgbString();
+    const pct = Math.round((mixAmount - 50) * 2);
+    return `color-mix(in srgb, rgb(255, 160, 0) ${pct}%, white)`;
   }
 }
  export function toPercentage(value: number, min: number, max: number): number {
-  return (((value - min) / max) * 100); //.toFixed(2);
+  return (((value - min) / (max - min)) * 100);
 }
 
 export function percentageToValue(percent: number, min: number, max: number): number {
-  return Math.floor(
+  return Math.round(
     (percent * (max - min) / 100 + min)
   )
 }
@@ -61,70 +54,3 @@ export const normalize = (value: number, min: number, max: number): number => {
 };
 
 export const capitalizeFirst = (s): string => (s && s[0].toUpperCase() + s.slice(1)) || "";
-
-/**
- * Converts any valid CSS color (hex, rgb, rgba, hsl, hsla, var)
- * into an rgba() string with the specified alpha.
- * If the color already has an alpha channel, the provided alpha overrides it.
- * If conversion isn't possible (e.g. CSS var), it falls back to color-mix().
- *
- * @param color - The CSS color string.
- * @param alpha - Desired opacity (0–1). Default = 0.2.
- * @returns A valid rgba() or color-mix() string.
- */
-export function toRGBAWithAlpha(color: string, alpha = 0.2): string {
-  if (!color) return color;
-
-  // --- Handle HEX colors ---
-  // Match: #RGB, #RRGGBB, #RGBA, #RRGGBBAA
-  if (/^#([A-Fa-f0-9]{3,8})$/.test(color)) {
-    let hex = color.substring(1);
-    // Expand #RGB → #RRGGBB
-    if (hex.length === 3) {
-      hex = hex.split('').map(ch => ch + ch).join('');
-    }
-    // Expand #RGBA → #RRGGBBAA
-    if (hex.length === 4) {
-      hex = hex.split('').map(ch => ch + ch).join('');
-    }
-
-    const bigint = parseInt(hex.substring(0, 6), 16);
-    const r = (bigint >> 16) & 255;
-    const g = (bigint >> 8) & 255;
-    const b = bigint & 255;
-
-    // Extract existing alpha if present (#RRGGBBAA)
-    let a = alpha;
-    if (hex.length === 8) {
-      const aByte = parseInt(hex.substring(6, 8), 16);
-      a = (aByte / 255) * alpha; // multiply by provided alpha
-    }
-
-    return `rgba(${r}, ${g}, ${b}, ${a})`;
-  }
-
-  // --- Handle RGB or RGBA ---
-  // rgb(255,0,0) → rgba(255,0,0,alpha)
-  if (/^rgba?\(/i.test(color)) {
-    return color
-      .replace(/rgba?\(([^)]+)\)/i, (_, inner) => {
-        const parts = inner.split(',').map(p => p.trim());
-        const [r, g, b] = parts;
-        return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-      });
-  }
-
-  // --- Handle HSL or HSLA ---
-  // hsl(120, 100%, 50%) → hsla(120, 100%, 50%, alpha)
-  if (/^hsla?\(/i.test(color)) {
-    return color
-      .replace(/hsla?\(([^)]+)\)/i, (_, inner) => {
-        const parts = inner.split(',').map(p => p.trim());
-        const [h, s, l] = parts;
-        return `hsla(${h}, ${s}, ${l}, ${alpha})`;
-      });
-  }
-
-  // --- Unknown format → return as-is ---
-  return color;
-}

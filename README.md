@@ -37,7 +37,6 @@ A button card with integrated slider for `automation, light, switch, fan, cover,
         - [Lock](#lock)
         - [In a grid](#grid)
 - [Group support](#groups)
-- [Known issues](#known-issues)
 - [Languages](#languages)
 - [Credits](#credits)
 
@@ -709,13 +708,6 @@ Mixed `group` entities are not supported, if you want to control multiple
 - lights use [Light group](https://www.home-assistant.io/integrations/light.group/)
 - covers use [Cover group](https://www.home-assistant.io/integrations/cover.group/)
 - media players use [Media player group](https://www.home-assistant.io/integrations/media_player.group/)
-
-## Known issues
-When you discover any bugs please open an [issue](https://github.com/custom-cards/slider-button-card/issues).
-
-### Input Number & Number entities
-- If the `input_number.entity.min value` is not cleanly divisible by the `input_number.entity.step value`, then the slider card is off by an amount. If your `input_number` has `min = 5`, `max = 25`, `step = 5` then it will work just fine. But if the `step` is 2, then it will be off. This also has the side effect of changing the `input_number` to an "out of bounds" value when modified via this card. Using `step = 1` avoids this problem.
-- The same limitation applies to `number` entities.
 
 ## Languages
 

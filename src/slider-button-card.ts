@@ -1,23 +1,21 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/camelcase */
 import { ActionHandlerEvent, applyThemesOnElement, computeStateDomain, hasConfigOrEntityChanged, HomeAssistant, LovelaceCard, LovelaceCardEditor } from './ha-helpers';
-import copy from 'fast-copy';
 import { css, html, LitElement, PropertyValues, TemplateResult, CSSResultGroup } from 'lit';
 import { customElement, eventOptions, property, query, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { styleMap } from 'lit/directives/style-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
-import { CARD_VERSION } from './const';
 import { Controller } from './controllers/controller';
 import { ControllerFactory } from './controllers/get-controller';
 import './editor';
 import type { SliderButtonCardConfig } from './types';
 import { ActionButtonConfigDefault, IconConfigDefault, SliderDirection } from './types';
-import { getSliderDefaultForEntity, normalize, toRGBAWithAlpha } from './utils';
+import { getSliderDefaultForEntity, normalize } from './utils';
 
 // This prints card name and verison to console
 console.info(
-  `%c  SLIDER-BUTTON-CARD %c Version ${CARD_VERSION} %c`,
+  `%c  SLIDER-BUTTON-CARD %c Version 1.13.0 %c`,
   'background-color: #555;color: #fff;padding: 3px 2px 3px 3px;border: 1px solid #555;border-radius: 3px 0 0 3px;font-family: Roboto,Verdana,Geneva,sans-serif;text-shadow: 0 1px 0 rgba(1, 1, 1, 0.3)',
   'background-color: transparent;color: #555;padding: 3px 3px 3px 2px;border: 1px solid #555; border-radius: 0 3px 3px 0;font-family: Roboto,Verdana,Geneva,sans-serif',
   'background-color: transparent'
@@ -67,8 +65,8 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
       show_name: true,
       show_state: true,
       compact: false,
-      icon: copy(IconConfigDefault),
-      action_button: copy(ActionButtonConfigDefault),
+      icon: structuredClone(IconConfigDefault),
+      action_button: structuredClone(ActionButtonConfigDefault),
     };
   }
   public getCardSize(): number {
@@ -86,11 +84,11 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
 
     this.config = {
       slider: getSliderDefaultForEntity(config.entity),
-      icon: copy(IconConfigDefault),
+      icon: structuredClone(IconConfigDefault),
       show_name: true,
       show_state: true,
       compact: false,
-      action_button: copy(ActionButtonConfigDefault),
+      action_button: structuredClone(ActionButtonConfigDefault),
       debug: false,
       ...config
     };

@@ -18,8 +18,6 @@
   "author": "M Hoog Antink",
   "license": "MIT",
   "dependencies": {
-    "@ctrl/tinycolor": "^3.4.0",
-    "fast-copy": "^2.1.1",
     "home-assistant-js-websocket": "^4.5.0",
     "lit": "^2.8.0"
   },
