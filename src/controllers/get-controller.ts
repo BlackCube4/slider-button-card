@@ -1,4 +1,4 @@
-import { computeDomain } from 'custom-card-helpers';
+import { computeDomain } from '../ha-helpers';
 import { Domain, SliderButtonCardConfig } from '../types';
 import { AutomationController } from './automation-controller';
 import { ClimateController } from './climate-controller';

@@ -1,4 +1,4 @@
-import { STATES_OFF } from 'custom-card-helpers';
+import { STATES_OFF } from '../ha-helpers';
 import { Controller } from './controller';
 
 export class SwitchController extends Controller {

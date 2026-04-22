@@ -1,4 +1,4 @@
-import { computeStateDomain, domainIcon, HomeAssistant } from 'custom-card-helpers';
+import { computeStateDomain, domainIcon, HomeAssistant } from '../ha-helpers';
 import { HassEntity } from 'home-assistant-js-websocket';
 import { SliderBackground, SliderButtonCardConfig, SliderDirection } from '../types';
 import { getLightColorBasedOnTemperature, normalize, percentageToValue, toPercentage } from '../utils';

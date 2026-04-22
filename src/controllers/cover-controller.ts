@@ -1,4 +1,4 @@
-import { stateIcon } from 'custom-card-helpers';
+import { stateIcon } from '../ha-helpers';
 import { CoverAttributes } from '../types';
 import { getEnumValues } from '../utils';
 import { Controller } from './controller';

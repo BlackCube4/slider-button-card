@@ -1,4 +1,4 @@
-import { STATES_OFF } from 'custom-card-helpers';
+import { STATES_OFF } from '../ha-helpers';
 import { SliderBackground, LightAttributes, LightColorModes } from '../types';
 import { getEnumValues, getLightColorBasedOnTemperature } from '../utils';
 import { Controller } from './controller';

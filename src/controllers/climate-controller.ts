@@ -1,4 +1,4 @@
-import { STATES_OFF } from 'custom-card-helpers';
+import { STATES_OFF } from '../ha-helpers';
 import { capitalizeFirst } from '../utils';
 import { Controller } from './controller';
 

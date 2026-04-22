@@ -4,7 +4,7 @@ import copy from 'fast-copy';
 import { CSSResult, LitElement, TemplateResult, css, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 
-import { ActionConfig, HomeAssistant, LovelaceCardEditor, computeDomain, fireEvent } from 'custom-card-helpers';
+import { ActionConfig, HomeAssistant, LovelaceCardEditor, computeDomain, fireEvent } from './ha-helpers';
 import { ActionButtonConfig, ActionButtonConfigDefault, ActionButtonMode, Domain, IconConfig, IconConfigDefault, SliderBackground, SliderButtonCardConfig, SliderConfig, SliderConfigDefault, SliderDirection, ColorMode } from './types';
 import { applyPatch, getEnumValues, getSliderDefaultForEntity } from './utils';
 
@@ -119,7 +119,7 @@ export class SliderButtonCardEditor extends LitElement implements LovelaceCardEd
             options: options
           },
         }}
-        .label="${label}"
+        label=${label}
         .value=${value}
         .required=${false}
         .configValue=${configValue}
@@ -225,7 +225,7 @@ export class SliderButtonCardEditor extends LitElement implements LovelaceCardEd
                 .selector=${{
                   ui_action: {}
                 }}
-                .label="Tap Action"
+            label="Tap Action"
                 .value=${this._icon.tap_action}
                 .required=${false}
                 .configValue=${"icon.tap_action"}
@@ -236,7 +236,7 @@ export class SliderButtonCardEditor extends LitElement implements LovelaceCardEd
                 .selector=${{
                   ui_action: {}
                 }}
-                .label="Hold Action"
+            label="Hold Action"
                 .value=${this._icon.hold_action}
                 .required=${false}
                 .configValue=${"icon.hold_action"}
@@ -247,7 +247,7 @@ export class SliderButtonCardEditor extends LitElement implements LovelaceCardEd
                 .selector=${{
                   ui_action: {}
                 }}
-                .label="Double Tap Action"
+            label="Double Tap Action"
                 .value=${this._icon.double_tap_action}
                 .required=${false}
                 .configValue=${"icon.double_tap_action"}
@@ -315,7 +315,7 @@ export class SliderButtonCardEditor extends LitElement implements LovelaceCardEd
                 .selector=${{
                   ui_action: {}
                 }}
-                .label="Tap Action"
+            label="Tap Action"
                 .value=${this._slider.tap_action}
                 .required=${false}
                 .configValue=${"slider.tap_action"}
@@ -326,7 +326,7 @@ export class SliderButtonCardEditor extends LitElement implements LovelaceCardEd
                 .selector=${{
                   ui_action: {}
                 }}
-                .label="Hold Action"
+            label="Hold Action"
                 .value=${this._slider.hold_action}
                 .required=${false}
                 .configValue=${"slider.hold_action"}
@@ -337,7 +337,7 @@ export class SliderButtonCardEditor extends LitElement implements LovelaceCardEd
                 .selector=${{
                   ui_action: {}
                 }}
-                .label="Double Tap Action"
+            label="Double Tap Action"
                 .value=${this._slider.double_tap_action}
                 .required=${false}
                 .configValue=${"slider.double_tap_action"}
@@ -371,7 +371,7 @@ export class SliderButtonCardEditor extends LitElement implements LovelaceCardEd
                 .value=${this._action_button.icon}
                 .placeholder=${this._action_button.icon || 'mdi:power'}
                 .configValue=${"action_button.icon"}
-                .label="Icon"
+            label="Icon"
                 @value-changed=${this._valueChanged}
               >
               </ha-icon-picker>
@@ -380,7 +380,7 @@ export class SliderButtonCardEditor extends LitElement implements LovelaceCardEd
                 .selector=${{
                   ui_action: {}
                 }}
-                .label="Tap Action"
+            label="Tap Action"
                 .value=${this._action_button.tap_action}
                 .required=${false}
                 .configValue=${"action_button.tap_action"}
@@ -391,7 +391,7 @@ export class SliderButtonCardEditor extends LitElement implements LovelaceCardEd
                 .selector=${{
                   ui_action: {}
                 }}
-                .label="Hold Action"
+            label="Hold Action"
                 .value=${this._action_button.hold_action}
                 .required=${false}
                 .configValue=${"action_button.hold_action"}
@@ -402,7 +402,7 @@ export class SliderButtonCardEditor extends LitElement implements LovelaceCardEd
                 .selector=${{
                   ui_action: {}
                 }}
-                .label="Double Tap Action"
+            label="Double Tap Action"
                 .value=${this._action_button.double_tap_action}
                 .required=${false}
                 .configValue=${"action_button.double_tap_action"}

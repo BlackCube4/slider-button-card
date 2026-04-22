@@ -1,5 +1,5 @@
 import { tinycolor, TinyColor } from '@ctrl/tinycolor';
-import { computeDomain } from 'custom-card-helpers';
+import { computeDomain } from './ha-helpers';
 import copy from 'fast-copy';
 import { Domain, SliderConfig, SliderConfigDefault, SliderConfigDefaultDomain } from './types';
 

@@ -1,11 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/camelcase */
-import { ActionHandlerEvent, applyThemesOnElement, computeStateDomain, handleAction, hasConfigOrEntityChanged, HomeAssistant, LovelaceCard, LovelaceCardEditor } from 'custom-card-helpers';
+import { ActionHandlerEvent, applyThemesOnElement, computeStateDomain, hasConfigOrEntityChanged, HomeAssistant, LovelaceCard, LovelaceCardEditor } from './ha-helpers';
 import copy from 'fast-copy';
-import { css, customElement, eventOptions, html, LitElement, property, PropertyValues, query, state, TemplateResult, CSSResult, CSSResultArray } from 'lit-element';
-import { classMap } from 'lit-html/directives/class-map';
-import { styleMap } from 'lit-html/directives/style-map';
-import { ifDefined } from 'lit-html/directives/if-defined';
+import { css, html, LitElement, PropertyValues, TemplateResult, CSSResultGroup } from 'lit';
+import { customElement, eventOptions, property, query, state } from 'lit/decorators.js';
+import { classMap } from 'lit/directives/class-map.js';
+import { styleMap } from 'lit/directives/style-map.js';
+import { ifDefined } from 'lit/directives/if-defined.js';
 import { CARD_VERSION } from './const';
 import { Controller } from './controllers/controller';
 import { ControllerFactory } from './controllers/get-controller';
@@ -664,7 +665,7 @@ export class SliderButtonCard extends LitElement implements LovelaceCard {
     this.lastPointerId = null;
   }
 
-  static get styles(): CSSResult | CSSResultArray {
+  static get styles(): CSSResultGroup {
     return css`
       overflow_fix {
         overflow: hidden; 
