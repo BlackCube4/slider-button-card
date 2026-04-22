@@ -34,6 +34,7 @@ A button card with integrated slider for `automation, light, switch, fan, cover,
         - [Climate](#climate)
         - [Lock](#lock)
         - [In a grid](#grid)
+- [Building from source](#building-from-source)
 - [Credits](#credits)
 
 ## Installation
@@ -698,6 +699,21 @@ columns: 4
 </td>
 </tr>
 </table>
+
+## Building from source
+
+To build the card yourself, you will need to have Node.js and npm installed.
+
+1. Clone the repository and navigate to the project directory.
+2. Install the necessary dependencies:
+   ```bash
+   npm install
+   ```
+3. Run the build script:
+   ```bash
+   npm run build
+   ```
+4. The compiled file will be generated at `dist/slider-button-card.js`.
 
 ## Credits
 - Forked from [Slider button card](https://github.com/custom-cards/slider-button-card) by [@Custom cards](https://github.com/custom-cards)
