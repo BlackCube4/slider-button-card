@@ -4,18 +4,12 @@ import copy from 'fast-copy';
 import { CSSResult, LitElement, TemplateResult, css, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 
-import { formfieldDefinition } from '../elements/formfield';
-import { switchDefinition } from '../elements/switch';
-import { textfieldDefinition } from '../elements/textfield';
-
-import { ScopedRegistryHost } from '@lit-labs/scoped-registry-mixin';
 import { ActionConfig, HomeAssistant, LovelaceCardEditor, computeDomain, fireEvent } from 'custom-card-helpers';
-import { localize, setLanguage } from './localize/localize';
 import { ActionButtonConfig, ActionButtonConfigDefault, ActionButtonMode, Domain, IconConfig, IconConfigDefault, SliderBackground, SliderButtonCardConfig, SliderConfig, SliderConfigDefault, SliderDirection, ColorMode } from './types';
 import { applyPatch, getEnumValues, getSliderDefaultForEntity } from './utils';
 
 @customElement('slider-button-card-editor')
-export class SliderButtonCardEditor extends ScopedRegistryHost(LitElement) implements LovelaceCardEditor {
+export class SliderButtonCardEditor extends LitElement implements LovelaceCardEditor {
   @property({ attribute: false }) public hass?: HomeAssistant;
   
   @state() private _config?: SliderButtonCardConfig;
@@ -27,14 +21,7 @@ export class SliderButtonCardEditor extends ScopedRegistryHost(LitElement) imple
   private actionModes = getEnumValues(ActionButtonMode);
   private colorModes = getEnumValues(ColorMode);
 
-  static elementDefinitions = {
-    ...formfieldDefinition,
-    ...switchDefinition,
-    ...textfieldDefinition,
-  }
-
   firstUpdated(): void {
-    // Use HA elements when using ScopedRegistry. Reference: https://gist.github.com/thomasloven/5f965bd26e5f69876890886c09dd9ba8
     this._loadHomeAssistantComponent("ha-entity-picker", { type: "entities", entities: [] });
     this._loadHomeAssistantComponent("ha-icon-picker", { type: "entities", entities: [] });
     this._loadHomeAssistantComponent("ha-selector", { type: "entities", entities: [] });
@@ -55,7 +42,6 @@ export class SliderButtonCardEditor extends ScopedRegistryHost(LitElement) imple
 
   public async setConfig(config: SliderButtonCardConfig): Promise<void> {
     this._config = config;
-    setLanguage(this.hass);
   }
 
   protected shouldUpdate(): boolean {
@@ -147,14 +133,13 @@ export class SliderButtonCardEditor extends ScopedRegistryHost(LitElement) imple
     if (!this.hass) {
       return html``;
     }
-    setLanguage(this.hass);
     
     return html`
       <div class="card-config">
         <div class="tabs">
           <div class="tab">
             <input type="checkbox" id="entity" class="tab-checkbox">
-            <label class="tab-label" for="entity">${localize('tabs.general.title')}</label>
+            <label class="tab-label" for="entity">General</label>
             <div class="tab-content">
               <ha-entity-picker
                 .hass=${this.hass}
@@ -164,50 +149,50 @@ export class SliderButtonCardEditor extends ScopedRegistryHost(LitElement) imple
                 @change=${this._valueChangedEntity}
               ></ha-entity-picker>
               
-              <mwc-textfield
-                label="${localize('tabs.general.name')}"
+              <ha-textfield
+                label="Name"
                 .value=${this._name}
                 .placeholder=${this._name || this.hass.states[this._entity]?.attributes?.friendly_name}
                 .configValue=${'name'}
                 @input=${this._valueChanged}
-              ></mwc-textfield>
-              ${this._renderOptionSelector(`attribute`, this._entityAttributes, localize('tabs.general.attribute'), this._attribute)}
+              ></ha-textfield>
+              ${this._renderOptionSelector(`attribute`, this._entityAttributes, 'Attribute', this._attribute)}
               <div class="side-by-side">
-                <mwc-formfield .label=${localize('tabs.general.show_name')}>
-                  <mwc-switch
+                <ha-formfield label="Show Name">
+                  <ha-switch
                     .checked=${this._show_name}
                     .configValue=${'show_name'}
                     @change=${this._valueChanged}
-                  ></mwc-switch>
-                </mwc-formfield>
-                <mwc-formfield .label=${localize('tabs.general.show_state')}>
-                  <mwc-switch
+                  ></ha-switch>
+                </ha-formfield>
+                <ha-formfield label="Show State">
+                  <ha-switch
                     .checked=${this._show_state}
                     .configValue=${'show_state'}
                     @change=${this._valueChanged}
-                  ></mwc-switch>
-                </mwc-formfield>
-                <mwc-formfield .label=${localize('tabs.general.show_attribute')}>
-                  <mwc-switch
+                  ></ha-switch>
+                </ha-formfield>
+                <ha-formfield label="Show Attribute">
+                  <ha-switch
                     .checked=${this._show_attribute}
                     .configValue=${'show_attribute'}
                     @change=${this._valueChanged}
-                  ></mwc-switch>
-                </mwc-formfield>
-                <mwc-formfield .label=${localize('tabs.general.compact')}>
-                  <mwc-switch
+                  ></ha-switch>
+                </ha-formfield>
+                <ha-formfield label="Compact Mode">
+                  <ha-switch
                     .checked=${this._compact}
                     .configValue=${'compact'}
                     @change=${this._valueChanged}
-                  ></mwc-switch>
-                </mwc-formfield>
+                  ></ha-switch>
+                </ha-formfield>
               </div>
             </div>
           </div>
 
           <div class="tab">
             <input type="checkbox" id="icon" class="tab-checkbox">
-            <label class="tab-label" for="icon">${localize('tabs.icon.title')}</label>
+            <label class="tab-label" for="icon">Icon</label>
             <div class="tab-content">
               <ha-icon-picker
                 .hass=${this.hass}
@@ -220,27 +205,27 @@ export class SliderButtonCardEditor extends ScopedRegistryHost(LitElement) imple
               ></ha-icon-picker>
               ${this.renderColorMode('icon')}
               <div class="side-by-side">
-                <mwc-formfield label="${localize('tabs.icon.show_icon')}">
-                  <mwc-switch
+                <ha-formfield label="Show Icon">
+                  <ha-switch
                     .checked=${this._icon.show}
                     .configValue=${'icon.show'}
                     @change=${this._valueChanged}
-                  ></mwc-switch>
-                </mwc-formfield>
-                <mwc-formfield label="${localize('use_brightness')}">
-                  <mwc-switch
+                  ></ha-switch>
+                </ha-formfield>
+                <ha-formfield label="Use Brightness">
+                  <ha-switch
                     .checked=${this._icon.use_brightness}
                     .configValue=${'icon.use_brightness'}
                     @change=${this._valueChanged}
-                  ></mwc-switch>
-                </mwc-formfield>
+                  ></ha-switch>
+                </ha-formfield>
               </div>
               <ha-selector
                 .hass=${this.hass}
                 .selector=${{
                   ui_action: {}
                 }}
-                .label="${localize('tap_action')}"
+                .label="Tap Action"
                 .value=${this._icon.tap_action}
                 .required=${false}
                 .configValue=${"icon.tap_action"}
@@ -251,7 +236,7 @@ export class SliderButtonCardEditor extends ScopedRegistryHost(LitElement) imple
                 .selector=${{
                   ui_action: {}
                 }}
-                .label="${localize('hold_action')}"
+                .label="Hold Action"
                 .value=${this._icon.hold_action}
                 .required=${false}
                 .configValue=${"icon.hold_action"}
@@ -262,7 +247,7 @@ export class SliderButtonCardEditor extends ScopedRegistryHost(LitElement) imple
                 .selector=${{
                   ui_action: {}
                 }}
-                .label="${localize('double_tap_action')}"
+                .label="Double Tap Action"
                 .value=${this._icon.double_tap_action}
                 .required=${false}
                 .configValue=${"icon.double_tap_action"}
@@ -273,51 +258,51 @@ export class SliderButtonCardEditor extends ScopedRegistryHost(LitElement) imple
           
           <div class="tab">
             <input type="checkbox" id="slider" class="tab-checkbox">
-            <label class="tab-label" for="slider">${localize('tabs.slider.title')}</label>
+            <label class="tab-label" for="slider">Slider</label>
             <div class="tab-content">
               <div class="side-by-side">
                 ${this._renderOptionSelector(
                   `slider.direction`,
                   this.directions.map(direction => {
-                    return {'value': direction, 'label': localize(`direction.${direction}`)}
-                  }), localize('tabs.slider.direction'),
+                    return {'value': direction, 'label': direction}
+                  }), 'Direction',
                   this._slider.direction || ''
                 )}
                 ${this._renderOptionSelector(
                   `slider.background`,
                   this.backgrounds.map(background => {
-                    return {'value': background, 'label': localize(`background.${background}`)}
-                  }), localize('tabs.slider.background'),
+                    return {'value': background, 'label': background}
+                  }), 'Background',
                   this._slider.background || ''
                 )}
               </div>
               ${this.renderColorMode('slider')}
               <div class="side-by-side">
-                <mwc-textfield
-                  label="${localize('tabs.slider.min_value')}"
+                <ha-textfield
+                  label="Min Value"
                   type="number"
                   .value=${this._slider.min_value?.toString() ?? ''}
                   .configValue=${'slider.min_value'}
                   @input=${this._valueChanged}
-                ></mwc-textfield>
-                <mwc-textfield
-                  label="${localize('tabs.slider.max_value')}"
+                ></ha-textfield>
+                <ha-textfield
+                  label="Max Value"
                   type="number"
                   .value=${this._slider.max_value?.toString() ?? ''}
                   .configValue=${'slider.max_value'}
                   @input=${this._valueChanged}
-                ></mwc-textfield>
+                ></ha-textfield>
               </div>
               <div class="side-by-side">
                 ${this.renderBrightness('slider')}
-                <mwc-formfield .label=${localize('tabs.slider.show_track')}>
-                  <mwc-switch
+                <ha-formfield label="Show Track">
+                  <ha-switch
                     .checked=${this._slider.show_track}
                     .configValue=${'slider.show_track'}
                     @change=${this._valueChanged}
                   ></ha-switch>
                 </ha-formfield>
-                <ha-formfield .label=${localize('tabs.slider.disable_sliding')}>
+                <ha-formfield label="Disable Sliding">
                   <ha-switch
                     .checked=${this._slider.disable_sliding}
                     .configValue=${'slider.disable_sliding'}
@@ -330,7 +315,7 @@ export class SliderButtonCardEditor extends ScopedRegistryHost(LitElement) imple
                 .selector=${{
                   ui_action: {}
                 }}
-                .label="${localize('tap_action')}"
+                .label="Tap Action"
                 .value=${this._slider.tap_action}
                 .required=${false}
                 .configValue=${"slider.tap_action"}
@@ -341,7 +326,7 @@ export class SliderButtonCardEditor extends ScopedRegistryHost(LitElement) imple
                 .selector=${{
                   ui_action: {}
                 }}
-                .label="${localize('hold_action')}"
+                .label="Hold Action"
                 .value=${this._slider.hold_action}
                 .required=${false}
                 .configValue=${"slider.hold_action"}
@@ -352,7 +337,7 @@ export class SliderButtonCardEditor extends ScopedRegistryHost(LitElement) imple
                 .selector=${{
                   ui_action: {}
                 }}
-                .label="${localize('double_tap_action')}"
+                .label="Double Tap Action"
                 .value=${this._slider.double_tap_action}
                 .required=${false}
                 .configValue=${"slider.double_tap_action"}
@@ -363,30 +348,30 @@ export class SliderButtonCardEditor extends ScopedRegistryHost(LitElement) imple
           
           <div class="tab">
             <input type="checkbox" id="action" class="tab-checkbox">
-            <label class="tab-label" for="action">${localize('tabs.action_button.title')}</label>
+            <label class="tab-label" for="action">Action Button</label>
             <div class="tab-content">
               <div class="side-by-side">
-                <mwc-formfield .label=${localize('tabs.action_button.show_button')}>
-                  <mwc-switch
+                <ha-formfield label="Show Button">
+                  <ha-switch
                     .checked=${this._action_button.show}
                     .configValue=${'action_button.show'}
                     @change=${this._valueChanged}
-                  ></mwc-switch>
-                </mwc-formfield>
-                <mwc-formfield .label=${localize('tabs.action_button.show_spinner')}>
-                  <mwc-switch
+                  ></ha-switch>
+                </ha-formfield>
+                <ha-formfield label="Show Spinner">
+                  <ha-switch
                     .checked=${this._action_button.show_spinner}
                     .configValue=${'action_button.show_spinner'}
                     @change=${this._valueChanged}
-                  ></mwc-switch>
-                </mwc-formfield>
+                  ></ha-switch>
+                </ha-formfield>
               </div>
               <ha-icon-picker
                 .hass=${this.hass}
                 .value=${this._action_button.icon}
                 .placeholder=${this._action_button.icon || 'mdi:power'}
                 .configValue=${"action_button.icon"}
-                .label=${localize('tabs.action_button.icon')}
+                .label="Icon"
                 @value-changed=${this._valueChanged}
               >
               </ha-icon-picker>
@@ -395,7 +380,7 @@ export class SliderButtonCardEditor extends ScopedRegistryHost(LitElement) imple
                 .selector=${{
                   ui_action: {}
                 }}
-                .label="${localize('tap_action')}"
+                .label="Tap Action"
                 .value=${this._action_button.tap_action}
                 .required=${false}
                 .configValue=${"action_button.tap_action"}
@@ -406,7 +391,7 @@ export class SliderButtonCardEditor extends ScopedRegistryHost(LitElement) imple
                 .selector=${{
                   ui_action: {}
                 }}
-                .label="${localize('hold_action')}"
+                .label="Hold Action"
                 .value=${this._action_button.hold_action}
                 .required=${false}
                 .configValue=${"action_button.hold_action"}
@@ -417,7 +402,7 @@ export class SliderButtonCardEditor extends ScopedRegistryHost(LitElement) imple
                 .selector=${{
                   ui_action: {}
                 }}
-                .label="${localize('double_tap_action')}"
+                .label="Double Tap Action"
                 .value=${this._action_button.double_tap_action}
                 .required=${false}
                 .configValue=${"action_button.double_tap_action"}
@@ -433,13 +418,13 @@ export class SliderButtonCardEditor extends ScopedRegistryHost(LitElement) imple
   protected renderBrightness(path: string): TemplateResult | void {
     const item = this[`_${path}`];
     return html`
-      <mwc-formfield .label=${localize('use_brightness')}>
-        <mwc-switch
+      <ha-formfield label="Use Brightness">
+        <ha-switch
           .checked=${item.use_brightness}
           .configValue="${path}.use_brightness"
           @change=${this._valueChanged}
-        ></mwc-switch>
-      </mwc-formfield>
+        ></ha-switch>
+      </ha-formfield>
     `;
   }
 
@@ -450,17 +435,17 @@ export class SliderButtonCardEditor extends ScopedRegistryHost(LitElement) imple
         ${this._renderOptionSelector(
           `${path}.color_mode`,
           this.colorModes.map(color_mode => {
-            return {'value': color_mode, 'label': localize(`color_mode.${color_mode}`)}
-          }), localize(`color_mode.label`),
+            return {'value': color_mode, 'label': color_mode}
+          }), 'Color Mode',
           item.color_mode || ''
         )}
         ${item.color_mode === 'custom' ? html`
-          <mwc-textfield
+          <ha-textfield
             .value=${item.color || ''}
             .configValue="${path}.color"
             @input=${this._valueChanged}
             type="color"
-          ></mwc-textfield>
+          ></ha-textfield>
         ` : ''}
       </div>
     `;
@@ -526,13 +511,11 @@ export class SliderButtonCardEditor extends ScopedRegistryHost(LitElement) imple
 
   static get styles(): CSSResult {
     return css`
-      mwc-textfield {
+      ha-textfield {
         width: 100%;
       }
-      mwc-switch {
+      ha-switch {
         padding: 16px 6px;
-        --mdc-theme-secondary: var(--switch-checked-button-color);
-        --mdc-theme-surface: var(--switch-unchecked-button-color);
       }
       .side-by-side {
         display: flex;

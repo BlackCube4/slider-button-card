@@ -2,6 +2,7 @@
   "name": "slider-button-card",
   "version": "1.13.0",
   "description": "Lovelace slider-button-card",
+  "type": "module",
   "keywords": [
     "home-assistant",
     "homeassistant",
@@ -18,44 +19,20 @@
   "license": "MIT",
   "dependencies": {
     "@ctrl/tinycolor": "^3.4.0",
-    "@lit-labs/scoped-registry-mixin": "^1.0.1",
-    "@material/mwc-formfield": "^0.27.0",
-    "@material/mwc-list": "^0.27.0",
-    "@material/mwc-notched-outline": "^0.27.0",
-    "@material/mwc-switch": "^0.27.0",
-    "@material/mwc-textarea": "^0.27.0",
-    "@material/mwc-textfield": "^0.27.0",
     "custom-card-helpers": "^1.6.6",
     "fast-copy": "^2.1.1",
     "home-assistant-js-websocket": "^4.5.0",
     "lit": "^2.8.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.12.3",
-    "@babel/plugin-proposal-class-properties": "^7.12.1",
-    "@babel/plugin-proposal-decorators": "^7.12.1",
-    "@rollup/plugin-json": "^4.1.0",
-    "@typescript-eslint/eslint-plugin": "^2.34.0",
-    "@typescript-eslint/parser": "^2.34.0",
-    "eslint": "^6.8.0",
-    "eslint-config-airbnb-base": "^14.2.1",
-    "eslint-config-prettier": "^6.15.0",
-    "eslint-plugin-import": "^2.22.1",
-    "eslint-plugin-prettier": "^3.1.4",
-    "prettier": "^1.19.1",
-    "rollup": "^1.32.1",
-    "rollup-plugin-babel": "^4.4.0",
-    "rollup-plugin-commonjs": "^10.1.0",
-    "rollup-plugin-node-resolve": "^5.2.0",
-    "rollup-plugin-serve": "^1.1.0",
-    "rollup-plugin-terser": "^5.3.1",
-    "rollup-plugin-typescript2": "^0.24.3",
-    "typescript": "^3.9.7"
+    "typescript": "^5.0.0",
+    "vite": "^6.4.0"
   },
   "scripts": {
-    "start": "rollup -c rollup.config.dev.js --watch",
-    "build": "npm run lint && npm run rollup",
-    "lint": "eslint src/*.ts",
-    "rollup": "rollup -c"
+    "dev": "vite build --watch",
+    "build": "vite build"
+  },
+  "overrides": {
+    "rollup": "^2.80.0"
   }
 }
