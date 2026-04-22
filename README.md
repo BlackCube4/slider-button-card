@@ -1,4 +1,4 @@
-# Slider button card by [@mattieha](https://www.github.com/mattieha)
+# SliderButtonCard for Home Assistant
 [![GitHub Release][releases-shield]][releases]
 [![hacs_badge](https://img.shields.io/badge/HACS-default-orange.svg?style=for-the-badge)](https://github.com/custom-components/hacs)
 
@@ -6,8 +6,6 @@ A button card with integrated slider for `automation, light, switch, fan, cover,
 
 ![Preview][preview]
 ![Preview 2][preview-2]
-
-#### Please ⭐️ this repo if you find it useful
 
 ## TOC
 - [Installation](#installation)
@@ -36,15 +34,13 @@ A button card with integrated slider for `automation, light, switch, fan, cover,
         - [Climate](#climate)
         - [Lock](#lock)
         - [In a grid](#grid)
-- [Group support](#groups)
-- [Languages](#languages)
 - [Credits](#credits)
 
 ## Installation
 
 ### HACS
 This card is available in [HACS][hacs] (Home Assistant Community Store).
-Just search for `Slider Button Card` in Frontend tab.
+Just search for `SliderButtonCard` in Frontend tab.
 
 ### Manual
 
@@ -703,34 +699,11 @@ columns: 4
 </tr>
 </table>
 
-## Groups
-Mixed `group` entities are not supported, if you want to control multiple
-- lights use [Light group](https://www.home-assistant.io/integrations/light.group/)
-- covers use [Cover group](https://www.home-assistant.io/integrations/cover.group/)
-- media players use [Media player group](https://www.home-assistant.io/integrations/media_player.group/)
-
-## Languages
-
-This card supports translations. Please, help to add more translations and improve existing ones. Here's a list of supported languages:
-
-- English
-- French
-- German
-- Hebrew
-- Korean
-- Nederlands (Dutch)
-- Polish (polski)
-- Portuguese
-- Russian
-- Slovak
-- [_Your language?_][add-translation]
-
 ## Credits
+- Forked from [Slider button card](https://github.com/custom-cards/slider-button-card) by [@Custom cards](https://github.com/custom-cards)
+- that was Forked from [Slider button card](https://github.com/mattieha/slider-button-card/) by [@mattieha](https://www.github.com/mattieha)
 - Originally inspired by [Slider entity row](https://github.com/thomasloven/lovelace-slider-entity-row)
-- Forked from [Slider button card](https://github.com/mattieha/slider-button-card/) by [@mattieha](https://www.github.com/mattieha)
 
----
-[![beer](https://www.buymeacoffee.com/assets/img/custom_images/black_img.png)](https://www.buymeacoffee.com/mattijsha)
 
 <!-- References -->
 [hacs]: https://hacs.xyz
