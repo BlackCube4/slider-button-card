@@ -68,7 +68,38 @@ export const domainIcon = (domain: string, state?: string): string => {
 };
 
 export const stateIcon = (stateObj: any): string => {
-  return domainIcon(computeStateDomain(stateObj), stateObj?.state);
+  if (!stateObj) return 'mdi:bookmark';
+
+  if (stateObj.attributes?.icon) {
+    return stateObj.attributes.icon;
+  }
+
+  const domain = computeStateDomain(stateObj);
+  const state = stateObj.state;
+  const deviceClass = stateObj.attributes?.device_class;
+
+  if (domain === 'cover') {
+    const isOpen = state !== 'closed';
+    switch (deviceClass) {
+      case 'awning':
+        return isOpen ? 'mdi:awning-outline' : 'mdi:awning';
+      case 'blind':
+      case 'shade':
+        return isOpen ? 'mdi:blinds-open' : 'mdi:blinds';
+      case 'curtain':
+        return isOpen ? 'mdi:curtains' : 'mdi:curtains-closed';
+      case 'damper':
+        return isOpen ? 'mdi:circle-outline' : 'mdi:circle-slice-8';
+      case 'door':
+        return isOpen ? 'mdi:door-open' : 'mdi:door-closed';
+      case 'garage':
+        return isOpen ? 'mdi:garage-open' : 'mdi:garage';
+      case 'gate':
+        return isOpen ? 'mdi:gate-open' : 'mdi:gate';
+    }
+  }
+
+  return domainIcon(domain, state);
 };
 
 export const fireEvent = (node: HTMLElement, type: string, detail?: any, options?: any): void => {

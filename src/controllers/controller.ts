@@ -323,7 +323,7 @@ export abstract class Controller {
         percentage = toPercentage(
           event.clientX,
           left,
-          width
+          left + width
         );
         if (this.invert) {
           percentage = 100 - percentage;
@@ -333,7 +333,7 @@ export abstract class Controller {
         percentage = toPercentage(
           event.clientX,
           left,
-          width
+          left + width
         );
         if (!this.invert) {
           percentage = 100 - percentage;
@@ -343,7 +343,7 @@ export abstract class Controller {
         percentage = toPercentage(
           event.clientY,
           top,
-          height
+          top + height
         );
         if (this.invert) {
           percentage = 100 - percentage;
@@ -353,7 +353,7 @@ export abstract class Controller {
         percentage = toPercentage(
           event.clientY,
           top,
-          height
+          top + height
         );
         if (!this.invert) {
           percentage = 100 - percentage;
